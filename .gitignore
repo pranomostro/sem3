@@ -2,7 +2,20 @@
 # Created by https://www.gitignore.io/api/c,linux,visualstudiocode
 
 ### C ###
-*.
+
+#Ignore all
+*
+
+#Unignore all with extensions
+!*.*
+
+#Unignore all dirs
+!*/
+
+#Unignore Makefile
+!makefile
+
+# Combination above ignores all files without extension, except Makefile
 
 # Prerequisites
 *.d
