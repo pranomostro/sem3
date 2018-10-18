@@ -6,6 +6,8 @@
 
 int main() {
   char buf[MAX_LINE_SZ];
-  read(stdin, buf, MAX_LINE_SZ);
+  int readChars = read(0, buf, sizeof(buf)); // 0 is stdin
+  buf[readChars] = '\0';  // Append a NUL char since read does'nt do this
+  printf("%s", buf);
   return 0;
 }
