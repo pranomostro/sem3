@@ -27,8 +27,16 @@ char* rotup(char* toEncode, int rotations) {
 
 int main() {
   char buf[MAX_LINE_SZ];
-  int readChars = read(0, buf, sizeof(buf)); // 0 is stdin
+  ssize_t readChars = read(0, buf, sizeof(buf)); // 0 is stdin
+  if (readChars < 0) {
+    write(2, "Error during read.", 18);
+  }
   buf[readChars] = '\0';  // Append a NUL char since read doesn't do this
-  printf("%s", buf);
+  write(1, "Hallo: ", 7);
+  write(1, buf, readChars);
+  write(1, " -- ", 4);
+  char* code = rotup(buf, 13);
+  write(1, code, strlen(code));
+  write(1, "\n", 1);
   return 0;
 }
