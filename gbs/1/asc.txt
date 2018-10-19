@@ -1,0 +1,3 @@
+Die ersten 32 Zeichen des ASCII-Codes sind Steuersymbole, die heute
+größtenteils nur noch selten verwendet werden (mit der Ausnahme von
+0x00, 0x08, 0x09, 0x0A und 0x20).
