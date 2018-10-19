@@ -31,7 +31,12 @@ int main() {
   if (readChars < 0) {
     write(2, "Error during read.", 18);
   }
-  buf[readChars] = '\0';  // Append a NUL char since read doesn't do this
+  // Append a NUL char since read doesn't do this
+  if (buf[readChars - 1] == '\n') {
+    buf[readChars - 1] = '\0';
+  } else {
+    buf[readChars] = '\0';
+  }
   write(1, "Hallo: ", 7);
   write(1, buf, readChars);
   write(1, " -- ", 4);
