@@ -1,6 +1,6 @@
 .PHONY: all
 
-all: hw asc rotup
+all: hw asc rotup hd
 
 hw: hw.c
 	gcc -Wall -o hw hw.c
