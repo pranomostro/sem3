@@ -1,0 +1,49 @@
+Hours per unit
+	Fish	Rum
+Jack	1	4
+Will	5	5
+Liz	5	2
+
+Opportunity costs per unit
+	Fish	Rum
+Jack	0.25	4
+Will	1	1
+Liz	2.5	0.4
+
+(a) Absolute advantage in fish/rum: Jack
+Comparative advantage in fish: Jack
+Comparative advantage in rum: Will
+
+(b) Performed on paper.
+
+(c) Jack specializes in producing fish, and Will specializes in producing
+rum. Will can produce 8 liters of rum per week, which leaves Jack to produce
+2 liters, and having 32 hours left, he produces 32kg fish. Will then sells
+3 liters of fish to Jack for 9 kg fish.
+
+Before specialization and trade
+	Fish	Rum
+Jack	20	5
+Will	3	5
+
+After specialization and trade
+	Fish	Rum
+Jack	21	5
+Will	9	5
+
+(d) Jack produces fish, Liz produces rum for 30 hours (fish in the rest)
+and Will produces fish as well.
+Produce per week: rum: 15kg
+	fish: 2kg+8kg+40kg=50kg
+
+Before specialization and trade
+	Fish	Rum
+Jack	20	5
+Will	3	5
+Liz	6	5
+
+After specialization and trade
+	Fish	Rum
+Jack	36	5
+Will	4	5
+Liz	10	5

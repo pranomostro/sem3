@@ -1,0 +1,9 @@
+a) 3: A × B → C, A × C → B, B × C → A
+b) 1. Student × Übung →⃗ Tutor, 2. Tutor × Student → Übung, 3. Tutor × Übung → Student
+c) 1. Gegeben einen Studenten und eine Übung, dann kann man den Tutor
+eindeutig identifizieren.
+2. Gegeben einen Tutor und einen Studenten, kann man die besuchte Übung
+eindeutig identifizieren.
+3. Gegeben einen Tutor und eine Übung, dann kann man einen besuchenden
+Studenten eindeutig identifizieren.
+d) 1. und 2.

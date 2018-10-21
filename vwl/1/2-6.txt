@@ -1,0 +1,26 @@
+Days per unit
+		Body	Engine
+Carl		16	4
+Gottlieb	10	5
+
+Opportunity cost per unit
+		Body	Engine
+Carl		4	0.25
+Gottlieb	2	0.5
+
+Problem 2
+(B)
+Problem 3
+Assumption: Their engines are compatible with their own car bodies
+as well.
+(C)
+Problem 4
+Gottlieb produces bodies, Carl produces 39 engines and after that
+bodies as well.
+(B)
+Problem 5
+Gottlieb produces 30 bodies, Carl produces 39 engines and 9 bodies.
+Production
+		Bodies	Engines
+Gottlieb	30	0
+Carl		9	39

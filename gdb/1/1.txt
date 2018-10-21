@@ -1,0 +1,25 @@
+a) Daten generiert durch Verfassen:
+* Verfasser des Tweets
+* Uhrzeit und Datum, an denen der Tweet verfasst wurde
+* Inhalt des Tweet
+* Hashtags im Tweet
+* Erwähnte Benutzer
+* Anzahl der Likes
+* Anzahl der Retweets
+* Potentiell Tweet, auf den geantwortet wurde
+* Potentiell Ort, an dem der Tweet verfasst wurde
+Daten generiert durch Like:
+* Likender Benutzer
+* Gelikter Tweet
+* Zeitpunkt und Datum des Like
+* Ort, an dem der Like vorgenommen wurde
+
+b) Muss man personenbezogene Daten löschen, wird es schwierig, Tweets
+eindeutig Benutzern zuzuordnen. Damit wird auch das Netz aus Antwort-
+und Kommentartweets zerstört. Zum anderen ist es schwierig, den Begriff
+"personenbezogene Daten" genau zu spezifizieren. Gehören etwa Uhrzeit des
+Tweet dazu? Oder der Benutzername, der nicht notwendigerweise dem echten
+Namen der Person entspricht. Twitter ist auch ein pseudonymer Dienst,
+bei dem kein Bürger notwendigerweise identifizierbar sein muss. Man
+könnte also personenbezogene Daten insofern definieren, als dass sie
+auf reale Personen zurückweisen.
