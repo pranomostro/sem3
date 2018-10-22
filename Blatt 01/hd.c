@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 
+static void hexdump(FILE*, char* buffer, int length);
+
+#include "hexdump.c"
+
 int main(int argc, char** argv)
 {
 	char c;
