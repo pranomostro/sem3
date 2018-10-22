@@ -34,6 +34,7 @@ int main() {
   // Append a NUL char since read doesn't do this
   if (buf[readChars - 1] == '\n') {
     buf[readChars - 1] = '\0';
+    readChars--;
   } else {
     buf[readChars] = '\0';
   }
