@@ -24,3 +24,5 @@ Production
 		Bodies	Engines
 Gottlieb	30	0
 Carl		9	39
+Price must be between their opportunity costs, so the answer
+is (D).

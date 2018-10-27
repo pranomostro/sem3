@@ -9,9 +9,7 @@ int main(int argc, char** argv)
 	size_t i;
 	ssize_t rs;
 	char in[BUFSIZ];
-	char *ia="Eingabe: ", *oa="Ausgabe: ", *greet="Hallo: ", *sep=" -- ";
-
-	write(1, ia, strlen(ia));
+	char *greet="Hallo: ", *sep=" -- ";
 
 	rs=read(0, in, BUFSIZ);
 
@@ -29,7 +27,6 @@ int main(int argc, char** argv)
 		rs--;
 	}
 
-	write(1, oa, strlen(oa));
 	write(1, greet, strlen(greet));
 	write(1, in, rs);
 	write(1, sep, strlen(sep));
