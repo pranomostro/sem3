@@ -1,0 +1,55 @@
+\documentclass{article}
+\usepackage{listings}
+
+\begin{document}
+
+\begin{lstlisting}
+a=read();
+b=read();
+
+if(a>b)
+{
+	p=-1;
+}
+else
+{
+	if(a>=0)
+	{
+		bf=1;
+		i=0;
+		while(i<b)
+		{
+			bf=i*bf;
+			i=i+1;
+		}
+		af=1;
+		i=0;
+		while(i<a)
+		{
+			af=i*af;
+			i=i+1;
+		}
+		ks=0;
+		k=a;
+		while(k<b)
+		{
+			ks=ks+k;
+			k=k+1;
+		}
+		p=bf/af*ks;
+	}
+	else
+	{
+		ks=0;
+		k=0;
+		while(k<b)
+		{
+			ks=ks+k;
+			k=k+1;
+		}
+		p=ks;
+	}
+}
+\end{lstlisting}
+\end{document}
+\bye

@@ -1,0 +1,166 @@
+\documentclass{article}
+\usepackage{listings}
+
+\begin{document}
+
+\section*{1.5.1}
+
+To be demonstrated:
+
+$$ (x<0 \land y=2) \Rightarrow A \land A \Rightarrow (x<-2 \land y>0) $$
+
+Because of the transitivity of implication it must therefore hold:
+
+$$ (x<0 \land y=2) \Rightarrow (x<-2 \land y>0) $$
+
+Lemma: $ A \Rightarrow (B \land C) \equiv (A \Rightarrow B) \land (A \Rightarrow C) $
+
+Proof:
+
+$$ A \Rightarrow (B \land C) $$
+$$ \neg A \lor (B \land C) $$
+$$ (\neg A \lor B) \land (\neg A \lor C) $$
+$$ (A \Rightarrow B) \land (A \Rightarrow C) $$
+
+It must therefore hold that $x<0 \Rightarrow x<-2$ and $y=2 \Rightarrow y>0$. The first
+is not the case when x=-1.
+
+Therefore, no such A can exist.
+
+\section*{1.5.2}
+
+To be demonstrated:
+
+$$ \not\exists A,B: (x>2 \Rightarrow A) \land (A \Rightarrow B \land x>2) \land (B \Rightarrow x>5) $$
+
+By the transitivity of implication it must hold that
+
+$$ x>2 \Rightarrow x>2 $$
+
+This is false (e.g.: x=3), and therefore there can be no such A, B.
+
+\section*{1.5.3}
+
+To be shown:
+
+$$ (B \lor C) \Rightarrow ((A \land B) \Rightarrow C \equiv A \land \neg C \Rightarrow \neg B $$
+
+Proof:
+
+Definition of implication:
+
+$$ (\neg B \land \neg C) \lor ((\neg A \lor \neg B) \lor C) \equiv \neg A \lor C \lor \neg B $$
+
+DeMorgan:
+
+$$ (\neg B \land \neg C ) \lor \neg A \lor \neg B \lor C \equiv \neg A \lor \neg B \lor C $$
+
+Absorption:
+
+$$ \neg A \lor \neg B \lor C \equiv \neg A \lor \neg B \lor C $$
+
+These statements are trivially equivalent.
+
+\section*{1.5.4}
+
+We have to find a mapping so that the expression can evaluate to false.
+
+$$ (((x<0 \Rightarrow A) \land (\neg A \Rightarrow x<-2)) \Rightarrow (y=3 \Rightarrow A)) \land (x<-2 \Rightarrow x<0) $$
+$$ ((\neg (x<0 \Rightarrow A) \lor \neg (\neg A \Rightarrow x<-2)) \lor (y=3 \Rightarrow A)) \land (x<-2 \Rightarrow x<0)  $$
+$$ ((\neg (\neg x<0 \lor A) \lor \neg (A \lor x<-2)) \lor (\neg y=3 \lor A)) \land (x<-1 \Rightarrow x<0) $$
+$$ ((x<0 \land \neg A) \lor (\neg A \land \neg x<-2) \lor (\neg y=3 \lor A)) \land (x<-2 \Rightarrow x<0)  $$
+$$ ((x<0 \land \neg A) \lor (\neg A \land \neg x<-2) \lor (\neg y=3 \lor A)) \land (\neg x<-2 \lor x<0)  $$
+$$ (x<0 \land \neg A \land (\neg x<-2 \lor x<0)) \lor (\neg A \land \neg x<-2 \land (\neg x<-2 \lor x<0)) \lor ((\neg
+y=3 \lor A) \land \neg x <-2 \land x<0) $$
+$$ (x<0 \land \neg A \land \neg x<-2) \lor (\neg A \land \neg x<-2 \land x<0) \lor (\neg y=3 \land \neg x<-2 \land x<0) \lor (\neg y=3 \land \neg x<-2 \land x<0) $$
+$$ (x<0 \land \neg A \land \neg x<-2) \lor (\neg y=3 \land \neg x<-2 \land x<0) $$
+
+This is not true for the case $A$, $y = 3$.
+
+\section*{1.6}
+
+$$ A:\equiv true $$
+$$ B:\equiv \forall n:true $$
+$$ C:\equiv \forall n:true \land \forall m:true $$
+$$ D:\equiv \forall n:true \land \forall m:true \land m \geq 0 $$
+$$ E:\equiv \forall n:true \land \forall m:true \land m \geq 0 \land p = m $$
+$$ F:\equiv \forall n:true \land \forall m:true \land m<0 $$
+$$ G:\equiv \forall n:true \land \forall m:true \land m<0 \land p=-m $$
+$$ H:\equiv \forall n:true \land \forall m:true \land (p=m \lor p=-m) $$
+$$ I:\equiv \forall n:true \land \forall m:true \land (p=m \lor p=-m) \land i=0 $$
+$$ J:\equiv \forall n:true \land \forall m:true \land (p=m \lor p=-m) \land i=0 \land x=n $$
+$$ K:\equiv \forall n:true \land \forall m:true \land (p=m \lor p=-m) \land i \leq p \land p \geq 0 \land x=n^{i+1} $$
+$$ L:\equiv \forall n:true \land \forall m:true \land (p=m \lor p=-m) \land i<p \land p \geq 0 \land x=n^{i+1} $$
+$$ M:\equiv \forall n:true \land \forall m:true \land (p=m \lor p=-m) \land i<p \land p \geq 0 \land x=n^{i+2} $$
+$$ N:\equiv \forall n:true \land \forall m:true \land (p=m \lor p=-m) \land i \leq p \land p \geq 0 \land x=n^{i+1} $$
+$$ O:\equiv \forall n:true \land \forall m:true \land (p=m \lor p=-m) \land i=p \land p \geq 0 \land x=n^{i+1} $$
+
+\section*{1.7}
+
+\begin{lstlisting}
+x=0;
+n=read();
+if(n>=0)
+{
+        i=0;
+        x=1;
+        while(i<n)
+        {
+                x=i*x;
+                i=i+1;
+        }
+}
+\end{lstlisting}
+
+\section*{1.8}
+
+\begin{lstlisting}
+a=read();
+b=read();
+
+if(a>b)
+{
+        p=-1;
+}
+else
+{
+        if(a>=0)
+        {
+                bf=1;
+                i=0;
+                while(i<b)
+                {
+                        bf=i*bf;
+                        i=i+1;
+                }
+                af=1;
+                i=0;
+                while(i<a)
+                {
+                        af=i*af;
+                        i=i+1;
+                }
+                ks=0;
+                k=a;
+                while(k<b)
+                {
+                        ks=ks+k;
+                        k=k+1;
+                }
+                p=bf/af*ks;
+        }
+        else
+        {
+                ks=0;
+                k=0;
+                while(k<b)
+                {
+                        ks=ks+k;
+                        k=k+1;
+                }
+                p=ks;
+        }
+}
+\end{lstlisting}
+
+\end{document}

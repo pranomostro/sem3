@@ -1,0 +1,47 @@
+To be demonstrated:
+
+$$ \not\exists A,B: (x>2 \Rightarrow A) \land (A \Rightarrow B \land x>2) \land (B \Rightarrow x>5) $$
+
+By the transitivity of implication it must hold that
+
+$$ x>2 \Rightarrow x>2 $$
+
+This is false (e.g.: x=3), and therefore there can be no such A, B.
+
+\iffalse
+
+x>2↦A
+A↦B
+B↦x>5
+
+Transitiv muss also gelten:
+
+x>2↦x>5
+
+und das ist nicht korrekt für x=3.
+
+(x>2↦A)Λ(A↦BΛx>2)Λ(B↦x>5)
+
+C==x>2
+D==x>5
+
+D↦C
+
+(C↦A)Λ(A↦BΛC)Λ(B↦D)Λ(D↦C)Λ~(C↦D)
+
+(~C∨A)Λ(~A∨(BΛC))Λ(~B∨D)Λ(~D∨C)Λ(~D∨C)Λ~(~C∨D)
+(~C∨A)Λ(~A∨B)Λ(~A∨C)Λ(~B∨D)Λ(~D∨C)Λ(~D∨C)ΛCΛ(~D)
+
+{{~C,A},{~A,B},{~A,C},{~B,D},{~D,C},{C},{~D}}
+OLR auf C:
+{{A},{~A,B},{~B,D},{~D}}
+OLR auf ~D:
+{{A},{~A,B},{~B}
+OLR auf A:
+{{B},{~B}}
+OLR auf B:
+{{}}
+
+Daher falsch.
+\fi
+\bye

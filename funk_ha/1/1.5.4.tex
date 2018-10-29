@@ -1,0 +1,13 @@
+We have to find a mapping so that the expression can evaluate to false.
+
+$$ (((x<0 \Rightarrow A) \land (\neg A \Rightarrow x<-2)) \Rightarrow (y=3 \Rightarrow A)) \land (x<-2 \Rightarrow x<0) $$
+$$ ((\neg (x<0 \Rightarrow A) \lor \neg (\neg A \Rightarrow x<-2)) \lor (y=3 \Rightarrow A)) \land (x<-2 \Rightarrow x<0)  $$
+$$ ((\neg (\neg x<0 \lor A) \lor \neg (A \lor x<-2)) \lor (\neg y=3 \lor A)) \land (x<-1 \Rightarrow x<0) $$
+$$ ((x<0 \land \neg A) \lor (\neg A \land \neg x<-2) \lor (\neg y=3 \lor A)) \land (x<-2 \Rightarrow x<0)  $$
+$$ ((x<0 \land \neg A) \lor (\neg A \land \neg x<-2) \lor (\neg y=3 \lor A)) \land (\neg x<-2 \lor x<0)  $$
+$$ (x<0 \land \neg A \land (\neg x<-2 \lor x<0)) \lor (\neg A \land \neg x<-2 \land (\neg x<-2 \lor x<0)) \lor ((\neg y=3 \lor A) \land \neg x <-2 \land x<0) $$
+$$ (x<0 \land \neg A \land \neg x<-2) \lor (\neg A \land \neg x<-2 \land x<0) \lor (\neg y=3 \land \neg x<-2 \land x<0) \lor (\neg y=3 \land \neg x<-2 \land x<0) $$
+$$ (x<0 \land \neg A \land \neg x<-2) \lor (\neg y=3 \land \neg x<-2 \land x<0) $$
+
+This is not true for the case $A$, $y = 3$.
+\bye
