@@ -3,6 +3,20 @@
 
 #include "list.h"
 
+/* For short lists:
+	0 elements:
+		l->first=NULL;
+		l->last=NULL;
+	1 element:
+		l->first==l->last==elem;
+		elem->next=NULL;
+	2 elements:
+		l->first=elem1;
+		l->last=elem2;
+		elem1->next=elem2;
+		elem2->next=NULL;
+*/
+
 list_t *list_init() {
 	printf("calling list_init\n");
 
