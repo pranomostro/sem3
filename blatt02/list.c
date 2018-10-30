@@ -73,8 +73,10 @@ struct list_elem *list_append(list_t *list, char *data) {
 	return le;
 }
 
+/* Make sure the list invariants from the top are true after this has finished */
+
 int list_remove(list_t *list, struct list_elem *elem) {
-	printf("calling list_append\n");
+	printf("calling list_remove\n");
 
 	struct list_elem *le, *nel;
 
