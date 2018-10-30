@@ -18,8 +18,6 @@
 */
 
 list_t *list_init() {
-	printf("calling list_init\n");
-
 	list_t *l=malloc(sizeof(list_t));
 
 	if(l==NULL)
@@ -31,8 +29,6 @@ list_t *list_init() {
 }
 
 struct list_elem *list_insert(list_t *list, char *data) {
-	printf("callist list_insert\n");
-
 	struct list_elem *le=malloc(sizeof(struct list_elem));
 
 	if(le==NULL)
@@ -49,8 +45,6 @@ struct list_elem *list_insert(list_t *list, char *data) {
 }
 
 struct list_elem *list_append(list_t *list, char *data) {
-	printf("calling list_append\n");
-
 	struct list_elem *le=malloc(sizeof(struct list_elem));
 
 	if(le==NULL)
@@ -73,14 +67,15 @@ struct list_elem *list_append(list_t *list, char *data) {
 	return le;
 }
 
-/* Make sure the list invariants from the top are true after this has finished */
-
 int list_remove(list_t *list, struct list_elem *elem) {
-	printf("calling list_remove\n");
-
 	struct list_elem *le, *nel;
 
+	if(list->first==NULL)
+		return -1;
+
 	if(elem==list->first) {
+		if(elem==list->last)
+			list->last=NULL;
 		le=list->first->next;
 		free(list->first);
 		list->first=le;
@@ -90,7 +85,12 @@ int list_remove(list_t *list, struct list_elem *elem) {
 	for(le=list->first; le->next!=NULL; le=le->next)
 		if(le->next==elem) {
 			nel=le->next;
-			le->next=nel->next;
+			if(nel==list->last) {
+				le->next=NULL;
+				list->last=le;
+			} else {
+				le->next=nel->next;
+			}
 			free(nel);
 			return 0;
 		}
@@ -98,9 +98,21 @@ int list_remove(list_t *list, struct list_elem *elem) {
 	return -1;
 }
 
-void list_print(list_t *list, void (*print_elem) (char *)) {
-	printf("calling list_print\n");
+struct list_elem *list_find(list_t *list, char *data, int (*cmp_elem) (const char *, const char *)) {
+	struct list_elem *le;
 
+	for(le=list->first; le!=NULL; le=le->next)
+		if(cmp_elem(le->data, data)==0)
+			return le;
+	return NULL;
+}
+
+void list_finit(list_t *list) {
+	while(list->first!=NULL)
+		list_remove(list, list->first);
+}
+
+void list_print(list_t *list, void (*print_elem) (char *)) {
 	int i;
 	struct list_elem *le;
 
