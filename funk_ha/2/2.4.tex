@@ -42,9 +42,10 @@ $if(a>b)$:
 
 \begin{equation}
 	\begin{array}{l}
-	(\neg a>b \lor ((\neg b>c \lor b\le c \le a) \land (b>c \lor c \le b \le a))) \land (a>c \lor b \le a \le c) \\
+	(\neg a>b \lor ((\neg b>c \lor b\le c \le a) \land (b>c \lor c \le b \le a) \land (a>c \lor b \le a \le c)) \\
 	\land \\
-	(a>b \lor \neg b>c \lor ((\neg a>c \lor a \le c \le b) \land (a>c \lor c \le a \le b))) \land (b>c \lor a \le b \le c)
+	(a>b \lor \neg b>c \lor ((\neg a>c \lor a \le c \le b) \land (a>c \lor c \le a \le b) \land (b>c \lor a \le b \le c)) \\
+	\equiv true
 	\end{array}
 \end{equation}
 
