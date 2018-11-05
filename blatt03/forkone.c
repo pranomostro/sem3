@@ -47,6 +47,10 @@ int main(int argc, char** argv) {
 
     int status;
     switch (forkRet) {
+        case -1:
+            // Error
+            perror("Fork failed");
+            break;
         case 0:
             // Child
             exit(countSeconds(k));
