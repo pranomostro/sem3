@@ -20,5 +20,17 @@ int main(int argc, char** argv) {
     int k = atoi(argv[1]);
     printf("%d\n", k);
 
+    pid_t forkRet = fork();
+
+    switch (forkRet) {
+        case 0:
+            // Child
+            break;
+        default:
+            // Parent
+            wait(NULL);
+            // Child terminated
+    }
+
     return 0;
 }
