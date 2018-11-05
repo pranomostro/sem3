@@ -28,12 +28,6 @@ int main(int argc, char** argv) {
         exit(-1);
     }
 
-    time_t rtime;
-    struct tm *timeinfo;
-    time(&rtime);
-    timeinfo = localtime(&rtime);
-    printf("Start: %s", asctime(timeinfo));
-
     for(char* p = argv[1]; *p != '\0'; p++) {
         if (!isdigit(*p)) {
             puts("K must be an integer");
@@ -43,6 +37,12 @@ int main(int argc, char** argv) {
 
     int k = atoi(argv[1]);
 
+    time_t rtime;
+    struct tm *timeinfo;
+    time(&rtime);
+    timeinfo = localtime(&rtime);
+    printf("Start: %s", asctime(timeinfo));
+    
     pid_t forkRet = fork();
 
     int status;
