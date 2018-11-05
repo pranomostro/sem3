@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
         case -1:
             // Error
             perror("Fork failed");
-            break;
+            exit(-1);
         case 0:
             // Child
             exit(countSeconds(k));
