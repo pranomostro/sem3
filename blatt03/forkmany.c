@@ -29,7 +29,56 @@ int main(int argc, char** argv) {
     int r = 0;
 
     // Parse input
+    int c;
+    char* kVal = NULL;
+    char* nVal = NULL;
+    while ((c = getopt(argc, argv, "k:n:r")) > -1) {
+        switch (c) {
+            case 'k':
+                kVal = optarg;
+                break;
+            case 'n':
+                nVal = optarg;
+                break;
+            case 'r':
+                r = 1;
+                break;
+            case '?':
+                if (optopt == 'k' || optopt == 'n') {
+                    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+                    exit(-1);
+                } else {
+                    fprintf(stderr, "Unknown option -%c", optopt);
+                    exit(-1);
+                }
+                break;
+            default:
+                abort();
+        }
+    }
+
     // Check input
+    if (kVal != NULL) {
+        for(char* p = kVal; *p != '\0'; p++) {
+            if (!isdigit(*p)) {
+                puts("K must be an integer");
+                exit(-1);
+            }
+        }
+
+        k = atoi(kVal);
+    }
+
+    if (nVal != NULL) {
+        for(char* p = nVal; *p != '\0'; p++) {
+            if (!isdigit(*p)) {
+                puts("N must be an integer");
+                exit(-1);
+            }
+        }
+
+        n = atoi(nVal);
+    }
 
     time_t rtime;
     struct tm *timeinfo;
