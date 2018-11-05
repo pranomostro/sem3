@@ -5,10 +5,17 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <time.h>
+#include <math.h>
 
-int countSeconds(int k) {
+#include "list.h"
+
+int countSeconds(int k, int random) {
     int pid = getpid();
     int ppid = getppid();
+
+    if (random) {
+        k = rand() % ((int) (1.5 * k) - k / 2) + k / 2;
+    }
 
     for (int i = 1; i <= k; i++) {
         int left = sleep(1);
@@ -80,6 +87,9 @@ int main(int argc, char** argv) {
         n = atoi(nVal);
     }
 
+    // Init list
+    // list_t* list = list_init();
+
     time_t rtime;
     struct tm *timeinfo;
     time(&rtime);
@@ -90,13 +100,24 @@ int main(int argc, char** argv) {
         pid_t forkRet = fork();
         if (forkRet == 0) {
             // Child
-            exit(countSeconds(k));
+            
+            // Init rand
+            srand(getpid());
+            
+            exit(countSeconds(k, r));
         } else if (forkRet == -1) {
             // Error
             perror("Fork failed");
             exit(-1); 
         }
+        
+        // char* buf = malloc(1024 * sizeof(char));
+        // sprintf(buf, "%d", forkRet);
+        // printf("%d buf: %s\n", forkRet, buf);
+        // list_append(list, buf);
     }
+
+    // list_print(list, puts);
 
     // Parent
     int status;
