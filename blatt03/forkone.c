@@ -4,6 +4,7 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <time.h>
 
 int countSeconds(int k) {
     int pid = getpid();
@@ -26,6 +27,12 @@ int main(int argc, char** argv) {
         puts("Usage: forkone <K>");
         exit(-1);
     }
+
+    time_t rtime;
+    struct tm *timeinfo;
+    time(&rtime);
+    timeinfo = localtime(&rtime);
+    printf("Start: %s", asctime(timeinfo));
 
     for(char* p = argv[1]; *p != '\0'; p++) {
         if (!isdigit(*p)) {
@@ -51,7 +58,11 @@ int main(int argc, char** argv) {
             if (WIFEXITED(status)) {
                 status = WEXITSTATUS(status);
             }
+            
             printf("Exit-Code: %d\n", status);
+            time(&rtime);
+            timeinfo = localtime(&rtime);
+            printf("Ende: %s", asctime(timeinfo));
             break;
     }
 
