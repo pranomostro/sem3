@@ -1,0 +1,55 @@
+\documentclass{article}
+
+\begin{document}
+
+Invariant:
+
+$$ I \equiv x=(|n|-i)*a $$
+
+Proof of validity:
+
+$$ Z:\equiv x=2*|n|*a $$
+$$ WP[\![write(x)]\!](Z) \equiv Z $$
+$$ WP[\![x=x*2]\!](Z) \equiv x*2=2*|n|*a $$
+$$ \equiv x=|n|*a $$
+$$ \equiv: U $$
+
+For the loop:
+
+$$ WP[\![i=i-1]\!](I) \equiv x=(|n|-i-1)*a $$
+$$ \equiv: Y $$
+$$ WP[\![x=x+a]\!](Y) \equiv x+a=(|n|-i-1)*a $$
+$$ \equiv x=(|n|-i)*a $$
+$$ \equiv: X $$
+
+$ I \Rightarrow X $:
+
+$$ x=(|n|-i)*a \Rightarrow x=(|n|-i)*a $$
+
+Condition:
+
+$$ WP[\![i==0]\!](U, I) \equiv (i==0 \land x=|n|*a) \lor (i>0 \land x=(|n|-i)*a $$
+$$ \equiv x=(|n|-i)*a $$
+$$ \equiv: T $$
+
+Outside of the loop:
+
+$$ WP[\![i=n]\!](T) \equiv x=(|n|-n)*a $$
+$$ \equiv: R $$
+
+$$ WP[\![i=-n]\!](T) \equiv x=(|n|-(-n))*a $$
+$$ \equiv S $$
+
+$$ WP [\![n<0]\!](R, S) \equiv (n \ge 0 \Rightarrow x=(|n|-n)*a) \land (n < 0 \Rightarrow x=(|n|-(-n))*a $$
+$$ \equiv (n<0 \lor x=(|n|-n)*a) \land (n \ge 0 \lor x=(|n|+n))*a $$
+$$ \equiv x=0*a $$
+$$ \equiv x=0 $$
+$$ \equiv: Q $$
+
+$$ WP[\![n=read()]\!](Q) \equiv Q $$
+
+$$ WP[\![a=read()]\!](Q) \equiv Q $$
+
+$$ WP[\![x=0]\!](x=0) \equiv true $$
+
+\end{document}

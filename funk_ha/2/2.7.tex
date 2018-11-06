@@ -1,0 +1,12 @@
+\documentclass{article}
+
+\begin{document}
+
+\section*{2.7}
+
+1. $ WP[\![\hbox{rand }x]\!](B) \equiv \forall n: B[n/x] $ \\
+2. $ WP[\![x=\hbox{either }e_{0}, \dots, e_{k}]\!](B) \equiv B[x/e_{0}] \lor \dots \lor B[x/e_{k}] $ \\
+3. $ WP[\![x=\hbox{e in a, b}]\!](B) \equiv (e \le b \land e \ge a \Rightarrow B[x/1]) \land ((\neg (e \le b \land e \ge a) \lor a>b) \Rightarrow B[0/x]) $ \\
+4. $ WP[\![stop]\!](B) \equiv true $
+
+\end{document}

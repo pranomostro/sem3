@@ -1,0 +1,43 @@
+\documentclass{article}
+
+\begin{document}
+Invariante:
+
+$$ I \equiv x=\sum_{k=0}^{i} a^k $$
+
+Proof of validity:
+
+$$ Z:\equiv x=\sum_{k=0}^{n} a^k $$
+$$ WP[\![write(x)]\!](Z) \equiv x=\sum_{k=0}^{n} a^k $$
+
+For the loop:
+
+$$ WP[\![x=x+1]\!](I) \equiv x+1=\sum_{k=0}^{i} a^k $$
+$$ \equiv x=\sum_{k=1}^{i} a^k $$
+$$ \equiv: Y $$
+
+$$ WP[\![x=x*a]\!](Y) \equiv x*a=\sum_{k=1}^{i} a^k $$
+$$ \equiv x=\sum_{k=1}^{i} a^{k-1} $$
+$$ \equiv x=\sum_{k=0}^{i-1} a^k $$
+$$ \equiv: X $$
+
+$$ WP[\![i=i+1]\!](X) \equiv \sum_{k=0}^{i} a^k $$
+$$ \equiv: W $$
+
+$ I \Rightarrow W: $
+$$ x=\sum_{k=0}^{i} a^k \Rightarrow x=\sum_{k=0}^{i} a^k $$
+
+Condition:
+
+$$ WP[\![i==n]\!](W, Z) \equiv (i \ne n \land \sum_{k=0}^{i} a^k) \lor (i==n \land \sum_{k=0}^{i} a^k) $$
+$$ \equiv \sum_{k=0}^{i} a^k $$
+$$ \equiv V $$
+
+Outside of the loop:
+
+$$ WP[\![i=0]\!](V) \equiv x=\sum_{k=0}^{0} a^k $$
+$$ \equiv x=1 $$
+
+$$ WP[\![x=1]\!](x=1) \equiv true $$
+
+\end{document}

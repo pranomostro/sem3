@@ -1,0 +1,152 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+
+\begin{document}
+
+\section*{2.4}
+
+$$ Z:\equiv a \le b \le c $$
+$b=t$:
+$$ a \le t \le c $$
+$a=b$:
+$$ b \le t \le c $$
+$t=a$:
+$$ b \le a \le c $$
+$if(a>b)$:
+$$ (a>b \Rightarrow a \le b \le c) \land (\neg a>b \Rightarrow b \le a \le c) $$
+$c=t$:
+$$ (a>b \Rightarrow a \le b \le t) \land (\neg a>b \Rightarrow b \le a \le t) $$
+$b=c$:
+$$ (a>c \Rightarrow a \le c \le t) \land (\neg a>c \Rightarrow c \le a \le t) $$
+$t=b$:
+$$ (a>c \Rightarrow a \le c \le b) \land (\neg a>c \Rightarrow c \le a \le b) $$
+$if(b>c)$:
+$$ (b>c \Rightarrow ((a>c \Rightarrow a \le c \le b) \land (\neg a>c \Rightarrow c \le a \le b))) \land (\neg b>c \Rightarrow a \le b \le c) $$
+$b=t$:
+$$ (t>c \Rightarrow ((a>c \Rightarrow a \le c \le t) \land (\neg a>c \Rightarrow c \le a \le t))) \land (\neg t>c \Rightarrow a \le t \le c) $$
+$a=b$:
+$$ (t>c \Rightarrow ((b>c \Rightarrow b \le c \le t) \land (\neg b>c \Rightarrow c \le b \le t))) \land (\neg t>c \Rightarrow b \le t \le c) $$
+$t=a$:
+$$ (a>c \Rightarrow ((b>c \Rightarrow b \le c \le a) \land (\neg b>c \Rightarrow c \le b \le a))) \land (\neg a>c \Rightarrow b \le a \le c) $$
+$if(a>b)$:
+\begin{equation}
+	\begin{array}{l}
+	(a>b \Rightarrow \\
+	(a>c \Rightarrow ((b>c \Rightarrow b \le c \le a) \land (\neg b>c \Rightarrow c \le b \le a))) \land (\neg a>c \Rightarrow b \le a \le c)) \\
+	\land \\
+	(\neg a>b \Rightarrow \\
+	(b>c \Rightarrow ((a>c \Rightarrow a \le c \le b) \land (\neg a>c \Rightarrow c \le a \le b))) \land (\neg b>c \Rightarrow a \le b \le c))
+	\end{array}
+\end{equation}
+
+\begin{equation}
+	\begin{array}{l}
+	(\neg a>b \lor ((\neg b>c \lor b\le c \le a) \land (b>c \lor c \le b \le a) \land (a>c \lor b \le a \le c)) \\
+	\land \\
+	(a>b \lor \neg b>c \lor ((\neg a>c \lor a \le c \le b) \land (a>c \lor c \le a \le b) \land (b>c \lor a \le b \le c)) \\
+	\equiv true
+	\end{array}
+\end{equation}
+
+\section*{2.5}
+
+Invariante:
+
+$$ I \equiv x=\sum_{k=0}^{i} a^k $$
+
+Proof of validity:
+
+$$ Z:\equiv x=\sum_{k=0}^{n} a^k $$
+$$ WP[\![write(x)]\!](Z) \equiv x=\sum_{k=0}^{n} a^k $$
+
+For the loop:
+
+$$ WP[\![x=x+1]\!](I) \equiv x+1=\sum_{k=0}^{i} a^k $$
+$$ \equiv x=\sum_{k=1}^{i} a^k $$
+$$ \equiv: Y $$
+
+$$ WP[\![x=x*a]\!](Y) \equiv x*a=\sum_{k=1}^{i} a^k $$
+$$ \equiv x=\sum_{k=1}^{i} a^{k-1} $$
+$$ \equiv x=\sum_{k=0}^{i-1} a^k $$
+$$ \equiv: X $$
+
+$$ WP[\![i=i+1]\!](X) \equiv \sum_{k=0}^{i} a^k $$
+$$ \equiv: W $$
+
+$ I \Rightarrow W: $
+$$ x=\sum_{k=0}^{i} a^k \Rightarrow x=\sum_{k=0}^{i} a^k $$
+
+Condition:
+
+$$ WP[\![i==n]\!](W, Z) \equiv (i \ne n \land \sum_{k=0}^{i} a^k) \lor (i==n \land \sum_{k=0}^{i} a^k) $$
+$$ \equiv \sum_{k=0}^{i} a^k $$
+$$ \equiv V $$
+
+Outside of the loop:
+
+$$ WP[\![i=0]\!](V) \equiv x=\sum_{k=0}^{0} a^k $$
+$$ \equiv x=1 $$
+
+$$ WP[\![x=1]\!](x=1) \equiv true $$
+
+\section*{2.6}
+
+Invariant:
+
+$$ I \equiv x=(|n|-i)*a $$
+
+Proof of validity:
+
+$$ Z:\equiv x=2*|n|*a $$
+$$ WP[\![write(x)]\!](Z) \equiv Z $$
+$$ WP[\![x=x*2]\!](Z) \equiv x*2=2*|n|*a $$
+$$ \equiv x=|n|*a $$
+$$ \equiv: U $$
+
+For the loop:
+
+$$ WP[\![i=i-1]\!](I) \equiv x=(|n|-i-1)*a $$
+$$ \equiv: Y $$
+$$ WP[\![x=x+a]\!](Y) \equiv x+a=(|n|-i-1)*a $$
+$$ \equiv x=(|n|-i)*a $$
+$$ \equiv: X $$
+
+$ I \Rightarrow X $:
+
+$$ x=(|n|-i)*a \Rightarrow x=(|n|-i)*a $$
+
+Condition:
+
+$$ WP[\![i==0]\!](U, I) \equiv (i==0 \land x=|n|*a) \lor (i>0 \land x=(|n|-i)*a $$
+$$ \equiv x=(|n|-i)*a $$
+$$ \equiv: T $$
+
+Outside of the loop:
+
+$$ WP[\![i=n]\!](T) \equiv x=(|n|-n)*a $$
+$$ \equiv: R $$
+
+$$ WP[\![i=-n]\!](T) \equiv x=(|n|-(-n))*a $$
+$$ \equiv S $$
+
+$$ WP [\![n<0]\!](R, S) \equiv (n \ge 0 \Rightarrow x=(|n|-n)*a) \land (n < 0 \Rightarrow x=(|n|-(-n))*a $$
+$$ \equiv (n<0 \lor x=(|n|-n)*a) \land (n \ge 0 \lor x=(|n|+n))*a $$
+$$ \equiv x=0*a $$
+$$ \equiv x=0 $$
+$$ \equiv: Q $$
+
+$$ WP[\![n=read()]\!](Q) \equiv Q $$
+
+$$ WP[\![a=read()]\!](Q) \equiv Q $$
+
+$$ WP[\![x=0]\!](x=0) \equiv true $$
+
+\section*{2.7}
+
+1. $ WP[\![\hbox{rand }x]\!](B) \equiv \forall n: B[n/x] $ \\
+2. $ WP[\![x=\hbox{either }e_{0}, \dots, e_{k}]\!](B) \equiv B[x/e_{0}] \lor \dots \lor B[x/e_{k}] $ \\
+3. $ WP[\![x=\hbox{e in a, b}]\!](B) \equiv (e \le b \land e \ge a \Rightarrow B[x/1]) \land ((\neg (e \le b \land e \ge a) \lor a>b) \Rightarrow B[0/x]) $ \\
+4. $ WP[\![stop]\!](B) \equiv true $
+
+\end{document}
