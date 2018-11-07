@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 #include "list.h"
 
@@ -88,7 +89,7 @@ int main(int argc, char** argv) {
     }
 
     // Init list
-    // list_t* list = list_init();
+    list_t* list = list_init();
 
     time_t rtime;
     struct tm *timeinfo;
@@ -111,10 +112,9 @@ int main(int argc, char** argv) {
             exit(-1); 
         }
         
-        // char* buf = malloc(1024 * sizeof(char));
-        // sprintf(buf, "%d", forkRet);
-        // printf("%d buf: %s\n", forkRet, buf);
-        // list_append(list, buf);
+        char* buf = malloc(1024 * sizeof(char));
+        sprintf(buf, "%d", forkRet);
+        list_append(list, buf);
     }
 
     // list_print(list, puts);
@@ -122,7 +122,12 @@ int main(int argc, char** argv) {
     // Parent
     int status;
     for (int i = 0; i < n; i++) {
-        waitpid(-1, &status, 0); // equivalent to wait(&status), but wanted to try this one ^^
+        pid_t retPID = waitpid(-1, &status, 0); // equivalent to wait(&status), but wanted to try this one ^^
+        char buf[1024];
+        sprintf(buf, "%d", retPID);
+        struct list_elem* toRemove = list_find(list, buf, strcmp);
+        free(toRemove->data);
+        list_remove(list, toRemove);
 
         // Child terminated
         // get exit status
@@ -136,6 +141,9 @@ int main(int argc, char** argv) {
     time(&rtime);
     timeinfo = localtime(&rtime);
     printf("Ende: %s", asctime(timeinfo));
+
+    // Deallocate list
+    list_finit(list);
 
     return 0;
 }
