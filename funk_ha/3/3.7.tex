@@ -1,0 +1,41 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+
+\begin{document}
+
+To be shown:
+
+$$ Z:\equiv x=100 $$
+
+Invariant:
+
+$$ I:\equiv y=2^{x/10} $$
+
+Proof of invariant: \\*
+
+$ WP[\![x=x+10]\!](I) $ \\*
+$ \equiv WP[\![x=x+10]\!](y=2^{x/10}) $ \\*
+$ \equiv y=2^{(x+10)/10} $ \\*
+$ \equiv y=2^{x/10+1} $ \\*
+$ \equiv: X $ \\*
+
+$ WP[\![y=y*2]\!](X) $ \\*
+$ \equiv WP[\![y=y*2]\!](y=2^{x/10+1} $ \\*
+$ \equiv y*2=2^{x/10+1} $ \\*
+$ \equiv y*2=2^{x/10}*2 $ \\*
+$ \equiv y=2^{x/10} $ \\*
+$ \equiv I $ \\*
+
+Proof of program correctness: \\*
+
+$ WP[\![y=1]\!]((y=1024 \land x=100) \lor (y\ne 1024 \land y=2^{x/10}) $ \\*
+$ \equiv 1\ne 1024 \land 1=2^{x/10} $ \\*
+$ \equiv 1=2^{x/10} $ \\*
+
+$ WP[\![x=0]\!](1=2^{x/10}) $ \\*
+$ \equiv 1=2^{0/10} $ \\*
+$ \equiv 1=2^0 $ \\*
+$ \equiv true $
+
+\end{document}

@@ -1,0 +1,153 @@
+\documentclass{article}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\begin{document}
+
+\section*{3.5}
+
+$$ Z \equiv x=\prod_{k=1}^{n} 3*k $$
+
+Invariant:
+
+$$ I \equiv y=3*i \land x=\prod_{k=1}^{i} 3*k $$
+
+Proof of invariant: \\*
+
+$ WP[\![i=i+1]\!](I) $ \\*
+$ \equiv WP[\![i=i+1]\!](y=3*i \land x=\prod_{k=1}^{i} 3*k) $ \\*
+$ \equiv y=3*(i+1) \land x=\prod_{k=1}^{i+1}3*k $ \\*
+$ \equiv Y $ \\*
+
+$ WP[\![x=y*x]\!](Y) $ \\*
+$ \equiv y=3*(i+1) \land x*y=\prod_{k=1}^{i+1}3*k $ \\*
+$ \equiv X $ \\*
+
+$ WP[\![y=y+3]\!](X) $ \\*
+$ \equiv y+3=3*(i+1) \land x*(y+3)=\prod_{k=1}^{i+1}3*k $ \\*
+$ \equiv y=3*i \land x*(3*i+3)=\prod_{k=1}^{i+1}3*k $ \\*
+$ \equiv y=3 \land x=\prod_{k=1}^{i}3*k $ \\*
+$ \equiv I $ \\*
+
+Proof of the rest of the program: \\*
+
+$ WP[\![y=0]\!]((i=n \land Z) \lor (i\ne n \land I) $ \\*
+$ \equiv WP[\![y=0]\!]((i=n \land x=\prod_{k=1}^{n} 3*k) \lor (i \ne n \land y=3*i \land x=\prod_{k=1}^{i}3*k) $ \\*
+$ \equiv ((i=n \land x=\prod_{k=1}^{n} 3*k) \lor (i \ne n \land 0=3*i \land x=\prod_{k=1}^{i}3*k) $ \\*
+$ \equiv H $ \\*
+
+$ WP[\![x=1]\!]((i=n \land x=\prod_{k=1}^{n} 3*k) \lor (i \ne n \land 0=3*i \land x=\prod_{k=1}^{i}3*k)) $ \\*
+$ \equiv (i=n \land 1=\prod_{k=1}^{n} 3*k) \lor (i \ne n \land 0=3*i \land 1=\prod_{k=1}^{i}3*k) $ \\*
+$ \equiv G $ \\*
+
+$ WP[\![i=0]\!]((i=n \land 1=\prod_{k=1}^{n} 3*k) \lor (i \ne n \land 0=3*i \land 1=\prod_{k=1}^{i}3*k)) $ \\*
+$ \equiv (0=n \land 1=\prod_{k=1}^{n} 3*k) \lor (0 \ne n \land 1=\prod_{k=1}^{i}3*k) $ \\*
+$ \equiv (1=1) \lor (1=1) $ \\*
+$ \equiv true $
+
+\section*{3.6}
+
+To be shown:
+
+$$ Z:\equiv x=\prod_{k=1}^{n} k^k $$
+
+is consistent with the program. \\*
+
+Invariant outer loop:
+
+$$ I_{out}:\equiv x=\prod_{k=1}^{i} k^k \land i \ge 0 $$
+
+Invariant inner loop:
+
+$$ I_{in}:\equiv x=i^{i-j}*\prod_{k=1}^{i-1} k^k \land i \ge 0 $$
+
+Proof of consistency of inner loop: \\*
+
+$ WP[\![j=j-1]\!](I_{in}) $ \\*
+$ \equiv WP[\![j=j-1]\!](x=i^{i-j}*\prod_{k=1}^{i-1} k^k) \land i \ge 0 $ \\*
+$ \equiv x=i^{i-(j-1)}*\prod_{k=1}^{i-1} k^k \land i \ge 0 $ \\*
+$ \equiv x=i^{i-j+1}*\prod_{k=1}^{i-1} k^k \land i \ge 0 $ \\*
+$ \equiv: Y $ \\*
+
+$ WP[\![x=x*i]\!](Y) $ \\*
+$ \equiv WP[\![x=x*i]\!](x=i^{i-j+1}*\prod_{k=1}^{i-1} k^k \land i \ge 0) $ \\*
+$ \equiv x*i=i^{i-j+1}*\prod_{k=1}^{i-1} k^k \land i \ge 0 $ \\*
+$ \equiv x=i^{i-j}*\prod_{k=1}^{i-1} k^k \land i \ge 0 $ \\*
+$ \equiv I_{in} $ \\*
+
+Proof of consistency of outer loop: \\*
+
+$ WP[\![j>0]\!](I_{out}, I_{in}) $ \\*
+$ \equiv (j\le 0 \land x=\prod_{k=1}^{i} k^k \land i \ge 0) \lor (j>0 \land x=i^{i-j}*\prod_{k=1}^{i-1} k^k \land i \ge 0) $ \\*
+$ \equiv: X $ \\*
+
+$ WP[\![j=i]\!]((j\le 0 \land x=\prod_{k=1}^{i} k^k \land i \ge 0) \lor (j>0 \land x=i^{i-j}*\prod_{k=1}^{i-1} k^k \land i \ge 0)) $ \\*
+$ \equiv (i\le 0 \land x=\prod_{k=1}^{i} k^k \land i \ge 0) \lor (i>0 \land x=i^{i-i}*\prod_{k=1}^{i-1} k^k \land i \ge 0) $ \\*
+$ \equiv i\ge 0 \land x=prod_{k=1}^{i-1} k^k $ \\*
+$ \equiv:W $ \\*
+
+$ WP[\![i=i+1]\!](W) $ \\*
+$ \equiv i+1\ge 0 \land x=\prod_{k=1}^{i+1-1} k^k $ \\*
+$ \equiv i+1\ge 0 \land x=\prod_{k=1}^{i} k^k $ \\*
+$ \equiv: V $ \\*
+
+It is obvious that $ (i\ge 0 \land \prod_{k=1}^{i} k^k) \Rightarrow (i+1\ge 0 \land x=\prod_{k=1}^{i} k^k) $, therefore $ I_{out} \Rightarrow V $. \\*
+
+Prove the consistency of the rest of the program: \\*
+
+$ WP[\![i==n]\!](Z, I_{out}) $ \\*
+$ \equiv (i=n \land x=\prod_{k=1}^{n} k^k) \lor (i\ne n \land x=\prod_{k=1}^{i} k^k) $ \\*
+$ \equiv x=\prod_{k=1}^{i} k^k $ \\*
+$ \equiv: U $ \\*
+
+$ WP[\![n=read()]\!](U) $ \\*
+$ \equiv U $ \\*
+
+$ WP[\![i=0]\!](U) $ \\*
+$ \equiv x=\prod_{k=1}^{0} k^k $ \\*
+$ \equiv x=1 $ \\*
+
+$ WP[\![x=1]\!](x=1) $ \\*
+$ \equiv 1=1 $ \\*
+$ \equiv true $ \\*
+
+$ \square $
+
+\section*{3.7}
+
+To be shown:
+
+$$ Z:\equiv x=100 $$
+
+Invariant:
+
+$$ I:\equiv y=2^{x/10} $$
+
+Proof of invariant: \\*
+
+$ WP[\![x=x+10]\!](I) $ \\*
+$ \equiv WP[\![x=x+10]\!](y=2^{x/10}) $ \\*
+$ \equiv y=2^{(x+10)/10} $ \\*
+$ \equiv y=2^{x/10+1} $ \\*
+$ \equiv: X $ \\*
+
+$ WP[\![y=y*2]\!](X) $ \\*
+$ \equiv WP[\![y=y*2]\!](y=2^{x/10+1} $ \\*
+$ \equiv y*2=2^{x/10+1} $ \\*
+$ \equiv y*2=2^{x/10}*2 $ \\*
+$ \equiv y=2^{x/10} $ \\*
+$ \equiv I $ \\*
+
+Proof of program correctness: \\*
+
+$ WP[\![y=1]\!]((y=1024 \land x=100) \lor (y\ne 1024 \land y=2^{x/10}) $ \\*
+$ \equiv 1\ne 1024 \land 1=2^{x/10} $ \\*
+$ \equiv 1=2^{x/10} $ \\*
+
+$ WP[\![x=0]\!](1=2^{x/10}) $ \\*
+$ \equiv 1=2^{0/10} $ \\*
+$ \equiv 1=2^0 $ \\*
+$ \equiv true $
+
+\end{document}

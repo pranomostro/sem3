@@ -1,0 +1,46 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+
+\begin{document}
+
+$$ Z \equiv x=\prod_{k=1}^{n} 3*k $$
+
+Invariant:
+
+$$ I \equiv y=3*i \land x=\prod_{k=1}^{i} 3*k $$
+
+Proof of invariant: \\*
+
+$ WP[\![i=i+1]\!](I) $ \\*
+$ \equiv WP[\![i=i+1]\!](y=3*i \land x=\prod_{k=1}^{i} 3*k) $ \\*
+$ \equiv y=3*(i+1) \land x=\prod_{k=1}^{i+1}3*k $ \\*
+$ \equiv Y $ \\*
+
+$ WP[\![x=y*x]\!](Y) $ \\*
+$ \equiv y=3*(i+1) \land x*y=\prod_{k=1}^{i+1}3*k $ \\*
+$ \equiv X $ \\*
+
+$ WP[\![y=y+3]\!](X) $ \\*
+$ \equiv y+3=3*(i+1) \land x*(y+3)=\prod_{k=1}^{i+1}3*k $ \\*
+$ \equiv y=3*i \land x*(3*i+3)=\prod_{k=1}^{i+1}3*k $ \\*
+$ \equiv y=3 \land x=\prod_{k=1}^{i}3*k $ \\*
+$ \equiv I $ \\*
+
+Proof of the rest of the program: \\*
+
+$ WP[\![y=0]\!]((i=n \land Z) \lor (i\ne n \land I) $ \\*
+$ \equiv WP[\![y=0]\!]((i=n \land x=\prod_{k=1}^{n} 3*k) \lor (i \ne n \land y=3*i \land x=\prod_{k=1}^{i}3*k) $ \\*
+$ \equiv ((i=n \land x=\prod_{k=1}^{n} 3*k) \lor (i \ne n \land 0=3*i \land x=\prod_{k=1}^{i}3*k) $ \\*
+$ \equiv H $ \\*
+
+$ WP[\![x=1]\!]((i=n \land x=\prod_{k=1}^{n} 3*k) \lor (i \ne n \land 0=3*i \land x=\prod_{k=1}^{i}3*k)) $ \\*
+$ \equiv (i=n \land 1=\prod_{k=1}^{n} 3*k) \lor (i \ne n \land 0=3*i \land 1=\prod_{k=1}^{i}3*k) $ \\*
+$ \equiv G $ \\*
+
+$ WP[\![i=0]\!]((i=n \land 1=\prod_{k=1}^{n} 3*k) \lor (i \ne n \land 0=3*i \land 1=\prod_{k=1}^{i}3*k)) $ \\*
+$ \equiv (0=n \land 1=\prod_{k=1}^{n} 3*k) \lor (0 \ne n \land 1=\prod_{k=1}^{i}3*k) $ \\*
+$ \equiv (1=1) \lor (1=1) $ \\*
+$ \equiv true $
+
+\end{document}

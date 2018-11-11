@@ -1,0 +1,74 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\begin{document}
+
+To be shown:
+
+$$ Z:\equiv x=\prod_{k=1}^{n} k^k $$
+
+is consistent with the program. \\*
+
+Invariant outer loop:
+
+$$ I_{out}:\equiv x=\prod_{k=1}^{i} k^k \land i \ge 0 $$
+
+Invariant inner loop:
+
+$$ I_{in}:\equiv x=i^{i-j}*\prod_{k=1}^{i-1} k^k \land i \ge 0 $$
+
+Proof of consistency of inner loop: \\*
+
+$ WP[\![j=j-1]\!](I_{in}) $ \\*
+$ \equiv WP[\![j=j-1]\!](x=i^{i-j}*\prod_{k=1}^{i-1} k^k) \land i \ge 0 $ \\*
+$ \equiv x=i^{i-(j-1)}*\prod_{k=1}^{i-1} k^k \land i \ge 0 $ \\*
+$ \equiv x=i^{i-j+1}*\prod_{k=1}^{i-1} k^k \land i \ge 0 $ \\*
+$ \equiv: Y $ \\*
+
+$ WP[\![x=x*i]\!](Y) $ \\*
+$ \equiv WP[\![x=x*i]\!](x=i^{i-j+1}*\prod_{k=1}^{i-1} k^k \land i \ge 0) $ \\*
+$ \equiv x*i=i^{i-j+1}*\prod_{k=1}^{i-1} k^k \land i \ge 0 $ \\*
+$ \equiv x=i^{i-j}*\prod_{k=1}^{i-1} k^k \land i \ge 0 $ \\*
+$ \equiv I_{in} $ \\*
+
+Proof of consistency of outer loop: \\*
+
+$ WP[\![j>0]\!](I_{out}, I_{in}) $ \\*
+$ \equiv (j\le 0 \land x=\prod_{k=1}^{i} k^k \land i \ge 0) \lor (j>0 \land x=i^{i-j}*\prod_{k=1}^{i-1} k^k \land i \ge 0) $ \\*
+$ \equiv: X $ \\*
+
+$ WP[\![j=i]\!]((j\le 0 \land x=\prod_{k=1}^{i} k^k \land i \ge 0) \lor (j>0 \land x=i^{i-j}*\prod_{k=1}^{i-1} k^k \land i \ge 0)) $ \\*
+$ \equiv (i\le 0 \land x=\prod_{k=1}^{i} k^k \land i \ge 0) \lor (i>0 \land x=i^{i-i}*\prod_{k=1}^{i-1} k^k \land i \ge 0) $ \\*
+$ \equiv i\ge 0 \land x=prod_{k=1}^{i-1} k^k $ \\*
+$ \equiv:W $ \\*
+
+$ WP[\![i=i+1]\!](W) $ \\*
+$ \equiv i+1\ge 0 \land x=\prod_{k=1}^{i+1-1} k^k $ \\*
+$ \equiv i+1\ge 0 \land x=\prod_{k=1}^{i} k^k $ \\*
+$ \equiv: V $ \\*
+
+It is obvious that $ (i\ge 0 \land \prod_{k=1}^{i} k^k) \Rightarrow (i+1\ge 0 \land x=\prod_{k=1}^{i} k^k) $, therefore $ I_{out} \Rightarrow V $. \\*
+
+Prove the consistency of the rest of the program: \\*
+
+$ WP[\![i==n]\!](Z, I_{out}) $ \\*
+$ \equiv (i=n \land x=\prod_{k=1}^{n} k^k) \lor (i\ne n \land x=\prod_{k=1}^{i} k^k) $ \\*
+$ \equiv x=\prod_{k=1}^{i} k^k $ \\*
+$ \equiv: U $ \\*
+
+$ WP[\![n=read()]\!](U) $ \\*
+$ \equiv U $ \\*
+
+$ WP[\![i=0]\!](U) $ \\*
+$ \equiv x=\prod_{k=1}^{0} k^k $ \\*
+$ \equiv x=1 $ \\*
+
+$ WP[\![x=1]\!](x=1) $ \\*
+$ \equiv 1=1 $ \\*
+$ \equiv true $ \\*
+
+$ \square $
+
+\end{document}
