@@ -17,8 +17,8 @@ struct threadInfo {
     int r;
 };
 
-void printT(pthread_t* t) {
-    printf("%ld\n", *t);
+void printContext(threadcontext_t* t) {
+    printf("%ld\n", t->thread);
 }
 
 void countSeconds(int k, int random) {
@@ -122,14 +122,16 @@ int main(int argc, char** argv) {
             fprintf(stderr, "Error creating thread.\n");
             exit(-1);
         }
-        list_append(list, thread);
+        threadcontext_t* context = malloc(sizeof(threadcontext_t));
+        context->thread = *thread;
+        list_append(list, context);
     }
 
     // list_print(list, printT);
 
     for (int i = 0; i < n; i++) {
         int s;
-        if (s = pthread_join(*list->first->data, NULL)) {
+        if (s = pthread_join(list->first->data->thread, NULL)) {
             switch (s) {
                 case EINVAL:
                     printf("inval\n");
@@ -141,7 +143,7 @@ int main(int argc, char** argv) {
             fprintf(stderr, "Join failed.\n");
             exit(-1);
         }
-        // free(list->first->data); // Seems to be not necessary
+        free(list->first->data);
         list_remove(list, list->first);
     }
     

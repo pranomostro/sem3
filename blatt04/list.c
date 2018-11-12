@@ -29,7 +29,7 @@ list_t *list_init() {
 	return l;
 }
 
-struct list_elem *list_insert(list_t *list, pthread_t *data) {
+struct list_elem *list_insert(list_t *list, threadcontext_t *data) {
 	struct list_elem *le=malloc(sizeof(struct list_elem));
 
 	if(le==NULL)
@@ -45,7 +45,7 @@ struct list_elem *list_insert(list_t *list, pthread_t *data) {
 	return le;
 }
 
-struct list_elem *list_append(list_t *list, pthread_t *data) {
+struct list_elem *list_append(list_t *list, threadcontext_t *data) {
 	struct list_elem *le=malloc(sizeof(struct list_elem));
 
 	if(le==NULL)
@@ -99,7 +99,7 @@ int list_remove(list_t *list, struct list_elem *elem) {
 	return -1;
 }
 
-struct list_elem *list_find(list_t *list, pthread_t *data, int (*cmp_elem) (const pthread_t *, const pthread_t *)) {
+struct list_elem *list_find(list_t *list, threadcontext_t *data, int (*cmp_elem) (const threadcontext_t *, const threadcontext_t *)) {
 	struct list_elem *le;
 
 	for(le=list->first; le!=NULL; le=le->next)
@@ -113,7 +113,7 @@ void list_finit(list_t *list) {
 		list_remove(list, list->first);
 }
 
-void list_print(list_t *list, void (*print_elem) (pthread_t *)) {
+void list_print(list_t *list, void (*print_elem) (threadcontext_t *)) {
 	int i;
 	struct list_elem *le;
 
