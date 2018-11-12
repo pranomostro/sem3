@@ -3,6 +3,9 @@
 typedef struct threadContext {
     pthread_t thread;
     int n;
+    int prio;
+    int start; // in seconds, start of first thread is 0
+    int target; // = k
 } threadcontext_t;
 
 struct list_elem {
