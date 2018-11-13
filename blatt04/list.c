@@ -21,6 +21,7 @@
 list_t *list_init() {
 	list_t *l=malloc(sizeof(list_t));
 
+	l->size = 0;
 	if(l==NULL)
 		return NULL;
 
@@ -42,6 +43,7 @@ struct list_elem *list_insert(list_t *list, threadcontext_t *data) {
 	if(list->last==NULL)
 		list->last=list->first;
 
+	list->size++;
 	return le;
 }
 
@@ -59,11 +61,13 @@ struct list_elem *list_append(list_t *list, threadcontext_t *data) {
 
 	if(list->last==NULL) {
 		list->last=le;
+		list->size++;
 		return le;
 	}
 
 	list->last->next=le;
 	list->last=le;
+	list->size++;
 
 	return le;
 }
@@ -80,6 +84,7 @@ int list_remove(list_t *list, struct list_elem *elem) {
 		le=list->first->next;
 		free(list->first);
 		list->first=le;
+		list->size--;
 		return 0;
 	}
 
@@ -93,6 +98,7 @@ int list_remove(list_t *list, struct list_elem *elem) {
 				le->next=nel->next;
 			}
 			free(nel);
+			list->size--;
 			return 0;
 		}
 
