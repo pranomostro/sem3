@@ -10,6 +10,8 @@
 #define PRR 1
 #define SRTN 2
 
+void print_time_step (int time, int thread_num);
+
 int main(int argc, char** argv) {
     int n, t, q, a;
     // Parse input
@@ -94,6 +96,24 @@ int main(int argc, char** argv) {
     }
 
     printf("%d %d %d %d\n", n, t, q, a);
+}
+
+void print_time_step (int time, int thread_num) {
+    static int    first_time = 1;
+    int           i;
+
+    if (first_time) {
+    printf ("  Time |  1  2  3  4  5  6  7  8  9  10\n");
+    printf ("-------+--------------------------------\n");
+    first_time = 0;
+    }
+    printf ("%06d |", time);
+    if (thread_num) {
+    for (i = 1; i < thread_num; i++)
+        printf ("   ");
+    printf ("  %d\n", thread_num);
+    } else
+    printf ("\n");
 }
 
 #undef RR
