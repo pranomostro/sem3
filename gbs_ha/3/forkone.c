@@ -8,7 +8,7 @@
 void countup(int j)
 {
 	int i;
-	for(i=1; i<=10; i++)
+	for(i=1; i<=j; i++)
 	{
 		printf("%d %d %d\n", getpid(), getppid(), i);
 		sleep(1);
@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 	time(&rawtime);
 	timeinfo=localtime(&rawtime);
 
-	printf("Start: %s\n", asctime(timeinfo));
+	printf("Start: %s", asctime(timeinfo));
 
 	switch((pid=fork())) {
 	case 0:
@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
 		wait(&status);
 		printf("Exit-Code: %d\n", WEXITSTATUS(status));
 	}
+
 	time(&rawtime);
 	timeinfo=localtime(&rawtime);
 

@@ -15,7 +15,7 @@ void countup(int k, int r)
 
 	for(int i=1; i<=k; i++)
 	{
-		printf("%d %d %d\n", getpid(), getppid(), i);
+		printf("%d %d %d\n", (unsigned int) pthread_self(), getpid(), i);
 		sleep(1);
 	}
 	exit((getpid()+k)%100);

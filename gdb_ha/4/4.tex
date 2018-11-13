@@ -1,13 +1,51 @@
-Aufgabe 1:
+\documentclass{article}
 
-(a) $ \{ r | r \in R \times S \land r.a1=r.b1 \} $
+\begin{document}
 
-$ \{ [a_1, \ldots, a_n, b_1, \ldots, b_m] | a_1=b_1 \land [a_1, \ldots, a_n] \in R \land [b_1, \ldots, b_m] \in S \} $ 
+\section*{Aufgabe 1}
 
-(b) $ \{ r | r \in R \times S \land r.a1=r.b1 \} \cup \{ r | r \in R \land \not\exists s \in S:(r.a1=s.b1) \} $
+\subsubsection*{(a)}
 
-(c) $ \{ r | r \in R \land \exists s \in S:(r.a1=s.b1) \} $
+$ \{ r | r \in R \times S \land r.a1=r.b1 \} $ \\*
 
-(d) $ \{ r | r \in \hbox{R } \land \not\exists s \in S(r.a1=s.b1) \} $
+$ \{ [a_1, \ldots, a_n, b_1, \ldots, b_m] | a_1=b_1 \land [a_1, \ldots, a_n] \in R \land [b_1, \ldots, b_m] \in S \} $ \\*
 
-\bye
+\subsubsection*{(b)}
+
+$ \{ r | r \in R \times S \land r.a1=r.b1 \} \cup \{ r | r \in R \land \not\exists s \in S:(r.a1=s.b1) \} $ \\*
+
+$ \{ [a_1, \ldots, a_n, b_1, \ldots, b_m] | a_1=b_1 \land [a_1, \ldots, a_n] \in R \land [b_1, \ldots, b_m] \in S \} \cup $ \\*
+$ \{ [a_1, \ldots, a_n] | [a_1, \ldots, a_n] \in R \land \not\exists [b_1, \ldots, b_m] \in S(a_1=b_1) \} $ \\*
+
+\subsubsection*{(c)}
+
+$ \{ r | r \in R \land \exists s \in S:(r.a1=s.b1) \} $ \\*
+
+$ \{ [a_1, \ldots, a_n] | [a_1, \ldots, a_n] \in R \land \exists [b_1, \ldots, b_m] \in S(a_1=b_1) \} $ \\*
+
+\subsubsection*{(d)}
+
+$ \{ r | r \in \hbox{R } \land \not\exists s \in S(r.a1=s.b1) \} $ \\*
+
+$ \{ [a_1, \ldots, a_n ] | [a_1, \ldots, a_n] \in R \land \not\exists [b_1, \ldots, b_m] \in S(a_1=b_1) \} $ \\*
+
+\section*{Aufgabe 2}
+
+\section*{Aufgabe 3}
+
+\subsubsection*{(a)}
+
+select s.* from Studenten s, hören h, Vorlesungen v, Professoren p where
+s.MatrNr=h.MatrNr and h.VorlNr=v.VorlNr and gelesenVon=PersNr
+
+\subsubsection*{(b)}
+
+select s1.* from Studenten s1, hören h where s.MatrNr=h.MatrNr and exists (select * from Studenten s2 where s2.Name="Carnap" and s2.MatrNr=s1.MatrNr);
+
+\subsubsection*{(c)}
+
+select a.* from Studenten s, hören h, Vorlesungen v, Professoren p, Assistenten a where s.MatrNr=h.MatrNr and h.VorlNr=v.VorlNr and v.gelesenVon=p.PersNr and a.Boss=p.PersNr;
+
+\subsubsection*{(d)}
+
+\end{document}

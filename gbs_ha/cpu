@@ -1,5 +1,5 @@
 #!/usr/bin/env rc
 
-tar -czf gemeinsam.tar.gz gemeinsam
-scp gemeinsam.tar.gz regenfus@lxhalle.in.tum.de:/u/halle/regenfus/home_at/scratch
-rm gemeinsam.tar.gz
+tar -czf all.tar.gz *
+scp all.tar.gz regenfus@lxhalle.in.tum.de:/u/halle/regenfus/home_at/scratch
+rm all.tar.gz
