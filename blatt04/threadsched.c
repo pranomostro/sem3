@@ -12,6 +12,10 @@
 
 void print_time_step (int time, int thread_num);
 
+void p(threadcontext_t *c) {
+    printf("N: %d, Prio: %d, Start: %d, Target: %d\n", c->n, c->prio, c->start, c->target);
+}
+
 int main(int argc, char** argv) {
     int n, t, q, a;
     // Parse input
@@ -96,6 +100,42 @@ int main(int argc, char** argv) {
     }
 
     printf("%d %d %d %d\n", n, t, q, a);
+
+    char buf[1024];
+    int params[3];
+    int pIndex;
+    list_t *list = list_init();
+
+    for(int i = 0; i < n; i++) {
+        fgets(buf, 1023, stdin);
+        char *l = buf;
+        pIndex = 0;
+        for(char* p = buf; *p != '\0'; p++) {
+            if (*p == ' ' || *p == '\n') {
+                *p = '\0';
+                for(char *q = l; q != p; q++) {
+                    if (!isdigit(*q)) {
+                        fprintf(stderr, "Expected integer\n");
+                        exit(-1);
+                    }
+                }
+                if (pIndex >= 3) {
+                    fprintf(stderr, "Expected 3 Parameters\n");
+                    exit(-1);
+                }
+                params[pIndex++] = atoi(l);
+                l = p+1;
+            }
+        }
+        threadcontext_t *context = malloc(sizeof(threadcontext_t));
+        context->n = i + 1;
+        context->prio = params[0];
+        context->start = params[1];
+        context->target = params[2];
+        list_append(list, context);
+    }
+    list_print(list, p);
+
 }
 
 void print_time_step (int time, int thread_num) {
