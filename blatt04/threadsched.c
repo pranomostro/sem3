@@ -62,6 +62,10 @@ int main(int argc, char** argv) {
         }
 
         n = atoi(nVal);
+        if (n > 10) {
+            fprintf(stderr, "N > 10\n");
+            exit(-1);
+        }
     }
 
     if (tVal != NULL) {
@@ -124,8 +128,13 @@ int main(int argc, char** argv) {
                     exit(-1);
                 }
                 params[pIndex++] = atoi(l);
+                
                 l = p+1;
             }
+        }
+        if (params[0] < 1 || params[0] > 10 || params[1] > 100000 || params[2] > 30000) {
+            fprintf(stderr, "Invalid Parameters\n");
+            exit(-1);
         }
         threadcontext_t *context = malloc(sizeof(threadcontext_t));
         context->n = i + 1;
@@ -136,6 +145,22 @@ int main(int argc, char** argv) {
     }
     list_print(list, p);
 
+    // Starting Simulation
+
+    int millis = 0;
+
+    while(list->first != NULL) {
+        switch (a) {
+            case RR:
+                break;
+            case PRR:
+                break;
+            case SRTN:
+                break;
+        }
+        
+        millis += t;
+    }
 }
 
 void print_time_step (int time, int thread_num) {
