@@ -131,3 +131,14 @@ void list_print(list_t *list, void (*print_elem) (threadcontext_t *)) {
 		print_elem(le->data);
 	}
 }
+
+int list_getHighestPrio(list_t *list, int (*cmp_elem) (const threadcontext_t *, const threadcontext_t *)) {
+	struct list_elem *next = list->first;
+	struct list_elem *highest = list->first;
+	for( ; next != NULL; next = next->next) {
+		if(cmp_elem(highest->data, next->data) > 0) {
+			highest = next;
+		}
+	}
+	return highest->data->prio;
+}

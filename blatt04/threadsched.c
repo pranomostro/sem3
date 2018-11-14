@@ -44,17 +44,6 @@ threadcontext_t *rr(list_t *ready, int t, int q, threadcontext_t *active) {
         list_remove(ready, ready->first);
         lastQ = t;
     }
-    // if (active != NULL && active->target <= 0) {
-    //     list_remove(ready, list_find(ready, active, cmp));
-    //     if (ready->first == NULL)
-    //         return NULL;
-    //     size = ready->size;
-    //     listIndex--;
-    //     active = NULL;
-    // }
-    // if (lastQ  + q == t || active == NULL) {
-        
-    // }
     return active;
 }
 /*
@@ -62,46 +51,32 @@ threadcontext_t *rr(list_t *ready, int t, int q, threadcontext_t *active) {
 * Insert prioritised tasks into the queue to "mock" a priority
 */
 
-int getHighestPrio(list_t *list) {
-    int prio = 11;
-    struct list_elem *next = list->first;
-    for(int i = 0; i < list->size; i++)
-    {
-        if (next->data->prio < prio) {
-            prio = next->data->prio;
-        }
-        next = next->next;
+int getHighestPrio(const threadcontext_t *a, const threadcontext_t *b) {
+    if (a->prio > b->prio) {
+        return 1;
     }
-    return prio;
+    return -1;
 }
 
-threadcontext_t *prr(list_t *list, int t, int q, int lastQ, threadcontext_t *active, list_t *queue) {
-    static int listIndex = 0;
-    static int prio = 11;
-    int size = list->size;
-    if (active != NULL && active->target <= 0) {
-        list_remove(list, list_find(list, active, cmp));
-        if (list->first == NULL)
-            return NULL;
-        prio = getHighestPrio(list);
-        size = list->size;
-        listIndex--;
-        active = NULL;
-    }
-    if (lastQ + q == t || active == NULL) {
-        for(int k = 0; k < size; k++) {
-            prio = getHighestPrio(list);
-            struct list_elem *next = list->first;
-            for(int i = 0; i < listIndex % size; i++) {
-                next = next->next;
-            }
-            listIndex = (listIndex + 1) % size;
-            if (next->data->start <= t && next->data->prio == prio) {
-                list_append(queue, next->data);
-                return next->data;
-            }
+threadcontext_t *prr(list_t *ready, int t, int q, threadcontext_t *active) {
+    printf("Got in Func\n");
+    if (lastQ + q == t || active == NULL || (active != NULL && active->target <= 0)) {
+        if (active != NULL && active->target > 0) {
+            list_append(ready, active);
         }
-        return NULL;
+        if (ready == NULL || ready->first == NULL) 
+            return NULL;
+        int prio = list_getHighestPrio(ready, getHighestPrio);
+        struct list_elem *tmp = ready->first;
+        for(int i = 0; i < ready->size; i++) {
+            if (tmp->data->prio <= prio) {
+                break;
+            }
+            tmp = tmp->next;
+        }
+        active = tmp->data;
+        list_remove(ready, tmp);
+        lastQ = t;
     }
     return active;
 }
@@ -274,8 +249,6 @@ int main(int argc, char** argv) {
     // Starting Simulation
 
     int millis = 0;
-    int last = 0;
-    threadcontext_t *old = NULL;
     threadcontext_t *active = NULL;
     list_t *ready = list_init();
 
@@ -284,7 +257,8 @@ int main(int argc, char** argv) {
         for(int  i = 0; i < list->size; i++) {
             if (l->data->start <= millis) {
                 list_append(ready, l->data);
-                list_remove(list, l);
+                struct list_elem *tmp = l;
+                list_remove(list, tmp);
             }
             if (l->next != NULL) {
                 l = l->next;
@@ -296,27 +270,11 @@ int main(int argc, char** argv) {
             case RR:
                 if ((active = rr(ready, millis, q, active))!= NULL)  {
                     active->target -= t;
-                    // if (old == NULL) {
-                    //     old = active;
-                    //     last = millis;
-                    // }
-                    // if (active->n != old->n || last == millis - q) {
-                    //     old = active;
-                    //     last = millis;   
-                    // }
                 }
                 break;
             case PRR:
-                if ((active = prr(list, millis, q, last, active, ready)) != NULL)  {
+                if ((active = prr(ready, millis, q, active)) != NULL)  {
                     active->target -= t;
-                    if (old == NULL) {
-                        old = active;
-                        last = millis;
-                    }
-                    if (active->n != old->n || last == millis - q) {
-                        old = active;
-                        last = millis;   
-                    }
                 }
                 break;
             case SRTN:
@@ -333,9 +291,6 @@ int main(int argc, char** argv) {
             }
         }
         millis += t;
-        if(millis > 1000) {
-            exit(-1);
-        }
     }
 }
 
