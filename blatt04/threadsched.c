@@ -86,38 +86,37 @@ threadcontext_t *prr(list_t *ready, int t, int q, threadcontext_t *active) {
 * Immediatly switch to the thread which has the lowest remaining computation time
 */
 
-int getShortestRemaining(list_t *list, int t) {
-    int index = -1;
+threadcontext_t *getShortestRemaining(list_t *list, int t) {
     int shortestTime = 30001;
     if (list->first == NULL)
-        return -1;
+        return NULL;
     struct list_elem *next = list->first;
+    struct list_elem *shortest = list->first;
     for(int i = 0; i < list->size; i++) {
-        if(next->data->target < shortestTime && next->data->start <= t) {
-            index = i;
+        if(next->data->start <= t && next->data->target < shortestTime) {
+            shortest = next;
             shortestTime = next->data->target;
         }
-        next = next->next;
+        if (next->next != NULL)
+            next = next->next;
+        else break;
     }
-    return index;
+    return shortest->data;
 }
 
-threadcontext_t *srtn(list_t *list, int t, threadcontext_t *active) {
-    if (list->first == NULL)
-        return NULL;
-    if (active != NULL && active->target <= 0) {
-        list_remove(list, list_find(list, active, cmp));
-        active = NULL;
+threadcontext_t *srtn(list_t *ready, int t, int q, threadcontext_t *active) {
+    if (lastQ + q == t || active == NULL || (active != NULL && active->target <= 0)) {
+        if (ready->first == NULL) {
+            return NULL;
+        }
+        if (active != NULL && active->target > 0) {
+            list_append(ready, active);
+        }
+        active = getShortestRemaining(ready, t);
+        list_remove(ready, list_find(ready, active, cmp));
+        lastQ = t;
     }
-    int index = -1;
-    if ((index = getShortestRemaining(list, t)) < 0) {
-        return NULL;
-    }
-    struct list_elem *next = list->first;
-    for(int i = 0; i < index; i++) {
-        next = next->next;
-    }
-    return next->data;
+    return active;
 }
 
 int main(int argc, char** argv) {
@@ -278,7 +277,7 @@ int main(int argc, char** argv) {
                 }
                 break;
             case SRTN:
-                if ((active = srtn(list, millis, active)) != NULL) {
+                if ((active = srtn(ready, millis, q, active)) != NULL) {
                     active->target -= t;
                 }
                 break;
@@ -291,6 +290,9 @@ int main(int argc, char** argv) {
             }
         }
         millis += t;
+        if (millis > 1000) {
+            exit(-1);
+        }
     }
 }
 
