@@ -281,14 +281,16 @@ int main(int argc, char** argv) {
 
     while(list->first != NULL || ready->first != NULL || active->target > 0) {
         struct list_elem *l = list->first;
-        for(int  i = 0; i < list->size && l != NULL; i++) {
+        for(int  i = 0; i < list->size; i++) {
             if (l->data->start <= millis) {
                 list_append(ready, l->data);
                 list_remove(list, l);
-                printf("Added: %d\n", l->data->n);
             }
-            if (l->next != NULL)
+            if (l->next != NULL) {
                 l = l->next;
+            } else {
+                break;
+            }
         }
         switch (a) {
             case RR:
