@@ -10,10 +10,139 @@
 #define PRR 1
 #define SRTN 2
 
+int lastQ = 0;
+
 void print_time_step (int time, int thread_num);
 
-void p(threadcontext_t *c) {
-    printf("N: %d, Prio: %d, Start: %d, Target: %d\n", c->n, c->prio, c->start, c->target);
+int cmpTarget(const threadcontext_t *a, const threadcontext_t *b) {
+    if (a->target > b->target) {
+        return 1;
+    }
+    return -1;
+}
+
+int cmp(const threadcontext_t *a, const threadcontext_t *b) {
+    if (a->n == b->n) {
+        return 0;
+    }
+    return 1;
+}
+
+/*
+* Round Robin:
+* Split in equal timeslots and arrange tasks accordingly
+*/
+
+threadcontext_t *rr(list_t *ready, int t, int q, threadcontext_t *active) {
+    if (lastQ + q == t || active == NULL || (active != NULL && active->target <= 0)) {
+        if (active != NULL && active->target > 0) {
+            list_append(ready, active);
+        }
+        if (ready == NULL || ready->first == NULL) 
+            return NULL;
+        active = ready->first->data;
+        list_remove(ready, ready->first);
+        lastQ = t;
+    }
+    // if (active != NULL && active->target <= 0) {
+    //     list_remove(ready, list_find(ready, active, cmp));
+    //     if (ready->first == NULL)
+    //         return NULL;
+    //     size = ready->size;
+    //     listIndex--;
+    //     active = NULL;
+    // }
+    // if (lastQ  + q == t || active == NULL) {
+        
+    // }
+    return active;
+}
+/*
+* Priorty Round Robin:
+* Insert prioritised tasks into the queue to "mock" a priority
+*/
+
+int getHighestPrio(list_t *list) {
+    int prio = 11;
+    struct list_elem *next = list->first;
+    for(int i = 0; i < list->size; i++)
+    {
+        if (next->data->prio < prio) {
+            prio = next->data->prio;
+        }
+        next = next->next;
+    }
+    return prio;
+}
+
+threadcontext_t *prr(list_t *list, int t, int q, int lastQ, threadcontext_t *active, list_t *queue) {
+    static int listIndex = 0;
+    static int prio = 11;
+    int size = list->size;
+    if (active != NULL && active->target <= 0) {
+        list_remove(list, list_find(list, active, cmp));
+        if (list->first == NULL)
+            return NULL;
+        prio = getHighestPrio(list);
+        size = list->size;
+        listIndex--;
+        active = NULL;
+    }
+    if (lastQ + q == t || active == NULL) {
+        for(int k = 0; k < size; k++) {
+            prio = getHighestPrio(list);
+            struct list_elem *next = list->first;
+            for(int i = 0; i < listIndex % size; i++) {
+                next = next->next;
+            }
+            listIndex = (listIndex + 1) % size;
+            if (next->data->start <= t && next->data->prio == prio) {
+                list_append(queue, next->data);
+                return next->data;
+            }
+        }
+        return NULL;
+    }
+    return active;
+}
+
+/*
+* Shortest Remaining Time Next:
+* Immediatly switch to the thread which has the lowest remaining computation time
+*/
+
+int getShortestRemaining(list_t *list, int t) {
+    int index = -1;
+    int shortestTime = 30001;
+    if (list->first == NULL)
+        return -1;
+    struct list_elem *next = list->first;
+    for(int i = 0; i < list->size; i++) {
+        if(next->data->target < shortestTime && next->data->start <= t) {
+            index = i;
+            shortestTime = next->data->target;
+        }
+        next = next->next;
+    }
+    return index;
+}
+
+threadcontext_t *srtn(list_t *list, int t, threadcontext_t *active) {
+    if (list->first == NULL)
+        return NULL;
+    if (active != NULL && active->target <= 0) {
+        list_remove(list, list_find(list, active, cmp));
+        active = NULL;
+    }
+    int index = -1;
+    if ((index = getShortestRemaining(list, t)) < 0) {
+        return NULL;
+    }
+    struct list_elem *next = list->first;
+    for(int i = 0; i < index; i++) {
+        next = next->next;
+    }
+    return next->data;
 }
 
 int main(int argc, char** argv) {
@@ -103,8 +232,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    printf("%d %d %d %d\n", n, t, q, a);
-
     char buf[1024];
     int params[3];
     int pIndex;
@@ -143,23 +270,70 @@ int main(int argc, char** argv) {
         context->target = params[2];
         list_append(list, context);
     }
-    list_print(list, p);
 
     // Starting Simulation
 
     int millis = 0;
+    int last = 0;
+    threadcontext_t *old = NULL;
+    threadcontext_t *active = NULL;
+    list_t *ready = list_init();
 
-    while(list->first != NULL) {
+    while(list->first != NULL || ready->first != NULL || active->target > 0) {
+        struct list_elem *l = list->first;
+        for(int  i = 0; i < list->size && l != NULL; i++) {
+            if (l->data->start <= millis) {
+                list_append(ready, l->data);
+                list_remove(list, l);
+                printf("Added: %d\n", l->data->n);
+            }
+            if (l->next != NULL)
+                l = l->next;
+        }
         switch (a) {
             case RR:
+                if ((active = rr(ready, millis, q, active))!= NULL)  {
+                    active->target -= t;
+                    // if (old == NULL) {
+                    //     old = active;
+                    //     last = millis;
+                    // }
+                    // if (active->n != old->n || last == millis - q) {
+                    //     old = active;
+                    //     last = millis;   
+                    // }
+                }
                 break;
             case PRR:
+                if ((active = prr(list, millis, q, last, active, ready)) != NULL)  {
+                    active->target -= t;
+                    if (old == NULL) {
+                        old = active;
+                        last = millis;
+                    }
+                    if (active->n != old->n || last == millis - q) {
+                        old = active;
+                        last = millis;   
+                    }
+                }
                 break;
             case SRTN:
+                if ((active = srtn(list, millis, active)) != NULL) {
+                    active->target -= t;
+                }
                 break;
         }
-        
+        if (list->first != NULL || ready->first != NULL || active != NULL) {
+            if (active != NULL) {
+                print_time_step(millis, active->n);
+            } else {
+                print_time_step(millis, 0);
+            }
+        }
         millis += t;
+        if(millis > 1000) {
+            exit(-1);
+        }
     }
 }
 
