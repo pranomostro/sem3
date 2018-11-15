@@ -10,7 +10,7 @@
 #define PRR 1
 #define SRTN 2
 
-int lastQ = 0;
+// int lastQ;
 
 void print_time_step (int time, int thread_num);
 
@@ -50,7 +50,7 @@ threadcontext_t *rr(list_t *ready, int t, int q, threadcontext_t *active) {
         struct list_elem *activeElem = ready->first;
         active = activeElem->data;
         list_remove(ready, activeElem);
-        lastQ = t;
+        // lastQ = t;
     // }
     return active;
 }
@@ -87,7 +87,7 @@ threadcontext_t *prr(list_t *ready, int t, int q, threadcontext_t *active) {
         struct list_elem *activeElem = list_getMax(ready, cmpPrio);
         active = activeElem->data;
         list_remove(ready, activeElem);
-        lastQ = t;
+        // lastQ = t;
     // }
     return active;
 }
@@ -137,7 +137,7 @@ threadcontext_t *srtn(list_t *ready, int t, int q, threadcontext_t *active) {
     struct list_elem *activeElem = list_getMax(ready, cmpTarget);
     active = activeElem->data;
     list_remove(ready, activeElem);
-    lastQ = t;
+    // lastQ = t;
     return active;
 }
 
@@ -270,10 +270,11 @@ int main(int argc, char** argv) {
     // Starting Simulation
 
     int millis = 0;
+    int lastQ = -q;
     threadcontext_t *active = NULL;
     list_t *ready = list_init();
 
-    while(list->first != NULL || ready->first != NULL || active->target > 0 || millis % q != 0) {
+    while(list->first != NULL || ready->first != NULL || (active != NULL && active->target > 0) || millis % q != 0) {
         struct list_elem *l = NULL;
         struct list_elem *next = list->first;
         // printf("List Size: %d\n", list->size);
@@ -288,18 +289,20 @@ int main(int argc, char** argv) {
             }
         }
         // printf("Leaving Loop\n");
-        if (millis % q == 0) {
-        switch (a) {
-            case RR:
-                active = rr(ready, millis, q, active);
-                break;
-            case PRR:
-                active = prr(ready, millis, q, active);
-                break;
-            case SRTN:
-                active = srtn(ready, millis, q, active);
-                break;
-        }
+        if (lastQ + q == millis || active == NULL) {
+            lastQ = millis;
+
+            switch (a) {
+                case RR:
+                    active = rr(ready, millis, q, active);
+                    break;
+                case PRR:
+                    active = prr(ready, millis, q, active);
+                    break;
+                case SRTN:
+                    active = srtn(ready, millis, q, active);
+                    break;
+            }
         }
         if (active != NULL) {
             active->target -= t;
