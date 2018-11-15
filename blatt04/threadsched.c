@@ -59,7 +59,6 @@ int getHighestPrio(const threadcontext_t *a, const threadcontext_t *b) {
 }
 
 threadcontext_t *prr(list_t *ready, int t, int q, threadcontext_t *active) {
-    printf("Got in Func\n");
     if (lastQ + q == t || active == NULL || (active != NULL && active->target <= 0)) {
         if (active != NULL && active->target > 0) {
             list_append(ready, active);
@@ -72,7 +71,9 @@ threadcontext_t *prr(list_t *ready, int t, int q, threadcontext_t *active) {
             if (tmp->data->prio <= prio) {
                 break;
             }
-            tmp = tmp->next;
+            if(tmp->next != NULL)
+                tmp = tmp->next;
+            else break;
         }
         active = tmp->data;
         list_remove(ready, tmp);
@@ -86,7 +87,7 @@ threadcontext_t *prr(list_t *ready, int t, int q, threadcontext_t *active) {
 * Immediatly switch to the thread which has the lowest remaining computation time
 */
 
-threadcontext_t *getShortestRemaining(list_t *list, int t) {
+struct list_elem *getShortestRemaining(list_t *list, int t) {
     int shortestTime = 30001;
     if (list->first == NULL)
         return NULL;
@@ -101,7 +102,7 @@ threadcontext_t *getShortestRemaining(list_t *list, int t) {
             next = next->next;
         else break;
     }
-    return shortest->data;
+    return shortest;
 }
 
 threadcontext_t *srtn(list_t *ready, int t, int q, threadcontext_t *active) {
@@ -112,8 +113,9 @@ threadcontext_t *srtn(list_t *ready, int t, int q, threadcontext_t *active) {
         if (active != NULL && active->target > 0) {
             list_append(ready, active);
         }
-        active = getShortestRemaining(ready, t);
-        list_remove(ready, list_find(ready, active, cmp));
+        struct list_elem *tmp = getShortestRemaining(ready, t);
+        active = tmp->data;
+        list_remove(ready, tmp);
         lastQ = t;
     }
     return active;
@@ -252,19 +254,20 @@ int main(int argc, char** argv) {
     list_t *ready = list_init();
 
     while(list->first != NULL || ready->first != NULL || active->target > 0) {
-        struct list_elem *l = list->first;
-        for(int  i = 0; i < list->size; i++) {
+        struct list_elem *l = NULL;
+        struct list_elem *next = list->first;
+        // printf("List Size: %d\n", list->size);
+        
+        while(next != NULL) {
+            l = next;
+            next = l->next;
             if (l->data->start <= millis) {
                 list_append(ready, l->data);
-                struct list_elem *tmp = l;
-                list_remove(list, tmp);
-            }
-            if (l->next != NULL) {
-                l = l->next;
-            } else {
-                break;
+                list_remove(list, l);
+                // printf("List Size after Iteration: %d\n", list->size);
             }
         }
+        // printf("Leaving Loop\n");
         switch (a) {
             case RR:
                 if ((active = rr(ready, millis, q, active))!= NULL)  {
@@ -290,9 +293,6 @@ int main(int argc, char** argv) {
             }
         }
         millis += t;
-        if (millis > 1000) {
-            exit(-1);
-        }
     }
 }
 
