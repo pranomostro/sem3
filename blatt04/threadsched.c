@@ -288,25 +288,22 @@ int main(int argc, char** argv) {
             }
         }
         // printf("Leaving Loop\n");
-        // if (millis % q != 0) {
         switch (a) {
             case RR:
-                if ((active = rr(ready, millis, q, active))!= NULL)  {
-                    active->target -= t;
-                }
+                active = rr(ready, millis, q, active);
                 break;
             case PRR:
-                if ((active = prr(ready, millis, q, active)) != NULL)  {
-                    active->target -= t;
-                }
+                active = prr(ready, millis, q, active);
                 break;
             case SRTN:
-                if ((active = srtn(ready, millis, q, active)) != NULL) {
-                    active->target -= t;
-                }
+                active = srtn(ready, millis, q, active);
                 break;
         }
-        // }
+
+        if (active != NULL) {
+            active->target -= t;
+        }
+
         if (list->first != NULL || ready->first != NULL || active != NULL) {
             if (active != NULL) {
                 print_time_step(millis, active->n);
