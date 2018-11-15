@@ -41,7 +41,7 @@ int cmp(const threadcontext_t *a, const threadcontext_t *b) {
 */
 
 threadcontext_t *rr(list_t *ready, int t, int q, threadcontext_t *active) {
-    if (lastQ + q == t || active == NULL || (active != NULL && active->target <= 0)) {
+    // if (lastQ + q == t || active == NULL || (active != NULL && active->target <= 0)) {
         if (active != NULL && active->target > 0) {
             list_append(ready, active);
         }
@@ -51,7 +51,7 @@ threadcontext_t *rr(list_t *ready, int t, int q, threadcontext_t *active) {
         active = activeElem->data;
         list_remove(ready, activeElem);
         lastQ = t;
-    }
+    // }
     return active;
 }
 /*
@@ -60,7 +60,7 @@ threadcontext_t *rr(list_t *ready, int t, int q, threadcontext_t *active) {
 */
 
 threadcontext_t *prr(list_t *ready, int t, int q, threadcontext_t *active) {
-    if (lastQ + q == t || active == NULL || (active != NULL && active->target <= 0)) {
+    // if (lastQ + q == t || active == NULL || (active != NULL && active->target <= 0)) {
         // if (active != NULL && active->target > 0) {
         //     list_append(ready, active);
         // }
@@ -88,7 +88,7 @@ threadcontext_t *prr(list_t *ready, int t, int q, threadcontext_t *active) {
         active = activeElem->data;
         list_remove(ready, activeElem);
         lastQ = t;
-    }
+    // }
     return active;
 }
 
@@ -273,7 +273,7 @@ int main(int argc, char** argv) {
     threadcontext_t *active = NULL;
     list_t *ready = list_init();
 
-    while(list->first != NULL || ready->first != NULL || active->target > 0) {
+    while(list->first != NULL || ready->first != NULL || active->target > 0 || millis % q != 0) {
         struct list_elem *l = NULL;
         struct list_elem *next = list->first;
         // printf("List Size: %d\n", list->size);
@@ -288,6 +288,7 @@ int main(int argc, char** argv) {
             }
         }
         // printf("Leaving Loop\n");
+        if (millis % q == 0) {
         switch (a) {
             case RR:
                 active = rr(ready, millis, q, active);
@@ -299,7 +300,7 @@ int main(int argc, char** argv) {
                 active = srtn(ready, millis, q, active);
                 break;
         }
-
+        }
         if (active != NULL) {
             active->target -= t;
         }
