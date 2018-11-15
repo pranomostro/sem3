@@ -36,7 +36,7 @@ $ \{ [a_1, \ldots, a_n ] | [a_1, \ldots, a_n] \in R \land \not\exists [b_1, \ldo
 \subsubsection*{(a)}
 
 select s.* from Studenten s, hören h, Vorlesungen v, Professoren p where
-s.MatrNr=h.MatrNr and h.VorlNr=v.VorlNr and gelesenVon=PersNr
+s.MatrNr=h.MatrNr and h.VorlNr=v.VorlNr and gelesenVon=PersNr;
 
 \subsubsection*{(b)}
 
@@ -47,5 +47,25 @@ select s1.* from Studenten s1, hören h where s.MatrNr=h.MatrNr and exists (sele
 select a.* from Studenten s, hören h, Vorlesungen v, Professoren p, Assistenten a where s.MatrNr=h.MatrNr and h.VorlNr=v.VorlNr and v.gelesenVon=p.PersNr and a.Boss=p.PersNr;
 
 \subsubsection*{(d)}
+
+select p.Name from Studenten s, hören h, Vorlesungen v, Professoren p where s.MatrNr=h.MatrNr and h.VorlNr=v.VorlNr and v.gelesenVon=p.PersNr and s.Name="Theophrastos";
+
+\subsubsection*{(e)}
+
+select from Studenten s, hören h, Vorlesungen v where s.Semester $\ge$ 1 and s.Semester $\le$ 6 and s.MatrNr=h.MatrNr and h.VorlNr=v.VorlNr;
+
+\subsubsection*{(f)}
+
+\section*{Aufgabe 4}
+
+\subsubsection*{(a)}
+
+update (select * from Professoren where Rang="C3") set Rang="C4";
+
+\subsubsection*{(b)}
+
+delete Assistenten where Fachgebiet="Planetenbewegung";
+
+\subsubsection*{(c)}
 
 \end{document}

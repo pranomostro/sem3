@@ -1,44 +1,60 @@
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <unistd.h>
 #include <time.h>
+#include <unistd.h>
 
-#include "list.h"
-
-void countup(int k, int r)
+struct Argument
 {
-	srandom(time(NULL)+getpid());
+	int k;
+	int r;
+};
 
-	k=r?(int)random()%((int)(1.5*k+1)-k/2)+k/2:k;
+typedef struct Argument Argument;
+
+void* countup(void *t)
+{
+	int k, r;
+	Argument *a=(Argument*)t;
+	srandom(time(NULL)+((unsigned int)pthread_self()));
+
+	k=a->k;
+	r=a->r;
+
+	if(r)
+		k=(int)random()%((int)(1.5*k+1)-k/2)+k/2;
 
 	for(int i=1; i<=k; i++)
 	{
-		printf("%d %d %d\n", (unsigned int) pthread_self(), getpid(), i);
+		printf("%10u\t%d\t%ld\n", (unsigned int) pthread_self(), getpid(), i);
 		sleep(1);
 	}
-	exit((getpid()+k)%100);
+	return NULL;
 }
 
 int main(int argc, char** argv)
 {
 	char c;
-	int status;
-	pid_t pid;
-	int kflag=10, nflag=1, rflag=0;
+	int status, nflag=1;
+	pthread_t *threads;
+	Argument *a=(Argument*)malloc(sizeof(Argument));
+
+	a->k=10;
+	a->r=0;
 
 	while((c=getopt(argc, argv, "k:n:r"))>-1)
 		switch(c)
 		{
 		case 'k':
-			kflag=atoi(optarg);
+			a->k=atoi(optarg);
 			break;
 		case 'n':
 			nflag=atoi(optarg);
 			break;
 		case 'r':
-			rflag=1;
+			a->r=1;
 			break;
 		default:
 			perror("unknown flag");
@@ -46,7 +62,7 @@ int main(int argc, char** argv)
 			break;
 		}
 
-	list_t *pids=list_init();
+	threads=(pthread_t*)malloc(nflag*sizeof(pthread_t));
 
 	time_t rawtime;
 	struct tm *timeinfo;
@@ -57,26 +73,17 @@ int main(int argc, char** argv)
 	printf("Start: %s", asctime(timeinfo));
 
 	for(int i=0; i<nflag; i++)
-		switch((pid=fork()))
+	{
+		status=pthread_create(&threads[i], NULL, countup, a);
+		if(status)
 		{
-		case 0:
-			countup(kflag, rflag);
-			break;
-		case -1:
-			perror("could not fork");
-			exit(2);
-			break;
-		default:
-			list_append(pids, pid);
-			break;
+			perror("could not create thread");
+			exit(1);
+		}
 	}
 
-	while(pids->first!=NULL)
-	{
-		wait(&status);
-		printf("Exit-Code: %d\n", WEXITSTATUS(status));
-		list_remove(pids, pids->last);
-	}
+	for(int i=0; i<nflag; i++)
+		pthread_join(threads[i], NULL);
 
 	time(&rawtime);
 	timeinfo=localtime(&rawtime);
