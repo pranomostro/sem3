@@ -288,7 +288,7 @@ int main(int argc, char** argv) {
             }
         }
         // printf("Leaving Loop\n");
-        if (millis % q != 0) {
+        // if (millis % q != 0) {
         switch (a) {
             case RR:
                 if ((active = rr(ready, millis, q, active))!= NULL)  {
@@ -306,7 +306,7 @@ int main(int argc, char** argv) {
                 }
                 break;
         }
-        }
+        // }
         if (list->first != NULL || ready->first != NULL || active != NULL) {
             if (active != NULL) {
                 print_time_step(millis, active->n);
