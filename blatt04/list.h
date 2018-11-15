@@ -27,5 +27,5 @@ int              list_remove (list_t *list, struct list_elem *elem);
 void             list_finit (list_t *list);
 void             list_print (list_t *list, void (*print_elem) (threadcontext_t *));
 struct list_elem *list_find (list_t *list, threadcontext_t *data, int (*cmp_elem) (const threadcontext_t *, const threadcontext_t *));
-int list_getHighestPrio(list_t *list, int (*cmp_elem) (const threadcontext_t *, const threadcontext_t *));
+struct list_elem *list_getMax(list_t *list, int (*cmp_elem) (const threadcontext_t *, const threadcontext_t *));
 

@@ -21,6 +21,13 @@ int cmpTarget(const threadcontext_t *a, const threadcontext_t *b) {
     return -1;
 }
 
+int cmpPrio(const threadcontext_t *a, const threadcontext_t *b) {
+    if (a->prio < b->prio) {
+        return 1;
+    }
+    return -1;
+}
+
 int cmp(const threadcontext_t *a, const threadcontext_t *b) {
     if (a->n == b->n) {
         return 0;
@@ -40,8 +47,9 @@ threadcontext_t *rr(list_t *ready, int t, int q, threadcontext_t *active) {
         }
         if (ready == NULL || ready->first == NULL) 
             return NULL;
-        active = ready->first->data;
-        list_remove(ready, ready->first);
+        struct list_elem *activeElem = ready->first;
+        active = activeElem->data;
+        list_remove(ready, activeElem);
         lastQ = t;
     }
     return active;
@@ -51,32 +59,34 @@ threadcontext_t *rr(list_t *ready, int t, int q, threadcontext_t *active) {
 * Insert prioritised tasks into the queue to "mock" a priority
 */
 
-int getHighestPrio(const threadcontext_t *a, const threadcontext_t *b) {
-    if (a->prio > b->prio) {
-        return 1;
-    }
-    return -1;
-}
-
 threadcontext_t *prr(list_t *ready, int t, int q, threadcontext_t *active) {
     if (lastQ + q == t || active == NULL || (active != NULL && active->target <= 0)) {
+        // if (active != NULL && active->target > 0) {
+        //     list_append(ready, active);
+        // }
+        // if (ready == NULL || ready->first == NULL) 
+        //     return NULL;
+        // int prio = list_getMax(ready, cmpPrio);
+        // struct list_elem *tmp = ready->first;
+        // for(int i = 0; i < ready->size; i++) {
+        //     if (tmp->data->prio <= prio) {
+        //         break;
+        //     }
+        //     if(tmp->next != NULL)
+        //         tmp = tmp->next;
+        //     else break;
+        // }
+        // active = tmp->data;
+        // list_remove(ready, tmp);
+        // lastQ = t;
         if (active != NULL && active->target > 0) {
             list_append(ready, active);
         }
         if (ready == NULL || ready->first == NULL) 
             return NULL;
-        int prio = list_getHighestPrio(ready, getHighestPrio);
-        struct list_elem *tmp = ready->first;
-        for(int i = 0; i < ready->size; i++) {
-            if (tmp->data->prio <= prio) {
-                break;
-            }
-            if(tmp->next != NULL)
-                tmp = tmp->next;
-            else break;
-        }
-        active = tmp->data;
-        list_remove(ready, tmp);
+        struct list_elem *activeElem = list_getMax(ready, cmpPrio);
+        active = activeElem->data;
+        list_remove(ready, activeElem);
         lastQ = t;
     }
     return active;
