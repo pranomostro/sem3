@@ -15,7 +15,7 @@ int lastQ = 0;
 void print_time_step (int time, int thread_num);
 
 int cmpTarget(const threadcontext_t *a, const threadcontext_t *b) {
-    if (a->target > b->target) {
+    if (a->target < b->target) {
         return 1;
     }
     return -1;
@@ -116,18 +116,28 @@ struct list_elem *getShortestRemaining(list_t *list, int t) {
 }
 
 threadcontext_t *srtn(list_t *ready, int t, int q, threadcontext_t *active) {
-    if (lastQ + q == t || active == NULL || (active != NULL && active->target <= 0)) {
-        if (ready->first == NULL) {
-            return NULL;
-        }
-        if (active != NULL && active->target > 0) {
-            list_append(ready, active);
-        }
-        struct list_elem *tmp = getShortestRemaining(ready, t);
-        active = tmp->data;
-        list_remove(ready, tmp);
-        lastQ = t;
+    // if (lastQ + q == t || active == NULL || (active != NULL && active->target <= 0)) {
+    //     if (ready->first == NULL) {
+    //         return NULL;
+    //     }
+    //     if (active != NULL && active->target > 0) {
+    //         list_append(ready, active);
+    //     }
+    //     struct list_elem *tmp = getShortestRemaining(ready, t);
+    //     active = tmp->data;
+    //     list_remove(ready, tmp);
+    //     lastQ = t;
+    // }
+    // return active;
+    if (active != NULL && active->target > 0) {
+        list_append(ready, active);
     }
+    if (ready == NULL || ready->first == NULL) 
+        return NULL;
+    struct list_elem *activeElem = list_getMax(ready, cmpTarget);
+    active = activeElem->data;
+    list_remove(ready, activeElem);
+    lastQ = t;
     return active;
 }
 
@@ -278,6 +288,7 @@ int main(int argc, char** argv) {
             }
         }
         // printf("Leaving Loop\n");
+        if (millis % q != 0) {
         switch (a) {
             case RR:
                 if ((active = rr(ready, millis, q, active))!= NULL)  {
@@ -294,6 +305,7 @@ int main(int argc, char** argv) {
                     active->target -= t;
                 }
                 break;
+        }
         }
         if (list->first != NULL || ready->first != NULL || active != NULL) {
             if (active != NULL) {
