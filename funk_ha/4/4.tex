@@ -1,0 +1,145 @@
+\documentclass{article}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\begin{document}
+
+\section*{4.4}
+
+r-Assignment:
+
+$$ r=12*n^2-12*i-k $$
+
+Loop invariant:
+
+$$ I\equiv i\le n^2 \land 0\le k\le 12 \land r=12*n^2-12*i-k $$
+
+Checking the loop: \\*
+
+$ WP[\![r=12*n^2-12*i-k]\!](I) $ \\*
+$ \equiv WP[\![r=12*n^2-12*i-k]\!](i \le n^2 \land 0\le k\le 12 \land r=12*n^2-12*i-k) $ \\*
+$ \equiv i \le n^2 \land 0\le k\le 12 $ \\*
+$ \Leftarrow i \le n^2 \land 0\le k\le 12 \land r<12*n^2-12*i-k $ \\*
+$ \equiv: L $ \\*
+
+$ WP[\![k=0]\!(L) $ \\*
+$ WP[\![k=0]\!](i \le n^2 \land 0\le k\le 12 \land r<12*n^2-12*i-k $ \\*
+$ \equiv i \le n^2 \land 0<12 \land r<12*n^2-12*i-0 $ \\*
+$ \equiv i \le n^2 \land r<12*n^2-12*i $
+$ \equiv: K $ \\*
+
+$ WP[\![i=i+1]\!](i \le n^2 \land r<12*n^2-12*i) $ \\*
+$ \equiv i+1 \le n^2 \land r<12*n^2-12*i-12 $ \\*
+$ \equiv: J $ \\*
+
+$ WP[\![k==12]\!](J, I) $ \\*
+$ \equiv WP[\![k==12]\!](i+1 \le n^2 \land r<12*n^2*i-12, i \le n^2 \land 0\le k\le 12 \land r<12*n^2-12*i-k) $ \\*
+$ \equiv (k\ne 12 \land i \le n^2 \land 0\le k\le 12 \land r<12*n^2-12*i-k) \lor (k==12 \land i+1 \le n^2 \land r<12*n^2*i-12) $ \\*
+$ \equiv (0\le k<12 \land i \le n^2 \land r<12*n^2-12*i-k) \lor (k=12 \land i+1 \le n^2 \land r<12*n^2*i-k) $ \\*
+$ \equiv: H $ \\*
+
+$ WP[\![k=k+1]\!](H) $ \\*
+$ \equiv WP[\![k=k+1]\!](0\le k<12 \land i \le n^2 \land r<12*n^2-12*i-k) \lor (k=12 \land i+1 \le n^2 \land r<12*n^2*i-k)) $ \\*
+$ \equiv (0\le k<11 \land i \le n^2 \land r<12*n^2-12*i-k-1) \lor (k=11 \land i+1 \le n^2 \land r<12*n^2*i-k-1)) $ \\*
+$ \equiv 0\le k\le 11 \land i \le n^2 \land r<12*n^2-12*i-k-1) $ \\*
+$ \Leftarrow i \le n^2 \land 0 \le k \le 12 \land r=12 *n^2 -12*i-k $ \\*
+$ \Leftarrow i<n^2 \land 0\le k\le 12 \land r=12*n^2-12*i-k $ \\*
+$ \equiv: E $ \\*
+
+Outside of the loop:
+
+$ WP[\![i==n^2]\!](true, i \le n^2 \land 0 \le k \le 12 \land r=12*n^2-12*i-k) $ \\*
+$ \equiv i\le n^2 \land 0\le k\le 12 \land r=12*n^2-12*i-k $ \\*
+$ \equiv: G $ \\*
+
+$ WP[\![r=12*n^2-12*i-k]\!](G) $ \\*
+$ \equiv WP[\![r=12*n^2-12*i-k]\!](i\le n^2 \land 0\le k\le 12 \land r=12*n^2-12*i-k) $ \\*
+$ \equiv i\le n^2 \land 0\le k\le 12 $ \\*
+$ \equiv: F $ \\*
+
+$ WP[\![k=0]\!](F) $ \\*
+$ \equiv WP[\![k=0]\!](i\le n^2 \land 0\le k\le 12 $ \\*
+$ \equiv i\le n^2 $ \\*
+
+$ WP[\![i=0]\!](i\le n^2) $ \\*
+$ \equiv 0\le n^2 $ \\*
+$ \equiv true $ \\*
+
+Now we need to check whether $ E \Rightarrow r>0 $. \\*
+
+$$ 0\le k \le 11 \land i<n^2 \land r=12*n^2-12*i-k \Rightarrow r>0 $$
+
+\section*{4.5}
+
+r-Assignment: \\*
+
+$$ r=a+1 $$
+
+Loop invariant: \\*
+
+$$ I\equiv: a\ge 0 \land (b=a \lor b=1) \land r=a $$ \\*
+
+Checking the loop: \\*
+
+$ WP[\![r=a]\!](I) $ \\*
+$ \equiv WP[\![r=a]\!](a\ge 0 \land (b=a \lor b=1) \land r=a) $ \\*
+$ \equiv a\ge 0 \land (b=a \lor b=1) $ \\*
+$ \Leftarrow a\ge 0 \land (b=a \lor b=1) \land r>a) $ \\*
+$ \equiv: Z $ \\*
+
+$ WP[\![a=a-1]\!](Z) $ \\*
+$ \equiv WP[\![a=a-1]\!](a \ge 0 \land (b=a \lor b=1) \land r>a) $ \\*
+$ \equiv a-1 \ge 0 \land (b=a-1 \lor b=1) \land r>a-1) $ \\*
+$ \equiv a \ge -1 \land (b=a-1 \lor b=1) \land r>a-1 $ \\*
+$ \equiv Y $ \\*
+
+$ WP[\![b=a]\!](Z) $ \\*
+$ \equiv WP[\![b=a]\!](a \ge 0 \land (b=a-1 \lor b=1) \land r>a) $ \\*
+$ \equiv a \ge 0 \land (a=a-1 \lor a=1) \land r>a $ \\*
+$ \equiv X $ \\*
+
+$ WP[\![a>0]\!](Y, X) $ \\*
+$ \equiv WP[\![a>0]\!](a \ge -1 \land (b=a-1 \lor b=1) \land r>a, a \ge 0 \land (a=a-1 \lor a=1) \land r>a $ \\*
+$ \equiv (a>0 \land a \ge 0 \land (b=a-1 \lor b=1) \land r>a) \lor (a \le 0 \land a \ge 0 \land (a=a-1 \lor a=1) \land r>a ) $ \\*
+$ \equiv a>0 \land (b=a-1 \lor b=1) \land r>a $ \\*
+$ \equiv: W $ \\*
+$ \Leftarrow I $ \\*
+
+$ W \Rightarrow r>0 $, because $r>a>0$. \\*
+
+\section*{4.6}
+
+r-Condition: \\*
+
+$ r=2*y-2*x+b-a $ \\*
+
+Loop-invariant:
+
+$ I:\equiv r=2*y-2*x+b-a \land a \in {0, -2} \land b\in {0, 3} $ \\*
+
+Loop analysis:
+
+$ WP[\![r=2*y-2*x+b-a]\!](I) $ \\*
+$ \equiv a \in \{0,-2\} \land b \in \{0,3\} $ \\*
+$ \Leftarrow r>2*y-2*x+b-a \land a \in \{0,-2\} \land b \in \{0,3\} $ \\*
+$ \equiv: B $ \\*
+
+$ WP[\![b=-b+3]\!](B) \equiv r>2*y-2*x-b+3-a \land a \in \{0,-2\} \land b \in \{0,3\} \land -b+3 \in {0,3} $ \\*
+$ \equiv: Z $ \\*
+
+$ WP[\![a=(a-1)*(a+2)]\!](Z) \equiv r>2*y-2*x-b+3-(a-1)*(a+2) \land (a-1)*(a+2) \in \{0,-2\} \land -b+3\in\{0,3\} $ \\*
+$ \equiv r>2*y-2*x-b+3-(a^2+2*a-a-2) \land (a-1)*(a+2) \in \{0, -2\} \land -b+3 \in \{0,3\} $ \\*
+$ \equiv r>2*y-2*x-b+3-a^2-a+2\land (a-1)*(a+2) \in \{0, -2\}\land -b +3 \in \{0, 3\} $ \\*
+
+$ \equiv r>2*y-2*x-b+5-a^2-a \land a^2+a-2 \in \{0, -2\} $ \\*
+$ \equiv r>2*y-2*x-b+5-a^2-a \land a \in \{0, -1, -2\} \land b \in \{0, 3\} $ \\*
+$ \equiv r>2*y-2*x-b+5-a^2-a \land a\in \{0, -2\} \land b \in \{0, 3\} $ \\*
+$ \equiv: Y $ \\*
+
+$ WP[\![x=x+3+a-b]\!](Y) \equiv r>2*y-(2*x+6+2*a-2*b)-b+5-a^2-a \land a \in \{0, -2\} \land b \in \{0, 3\} $ \\*
+$ \equiv r>2*y-2*x-6-2*a+2*b-b+5-a^2-a \land a \in \{0, -2\} \land b \in \{0, 3\} $ \\*
+$ \equiv r>2*y-2*x-3*a-a^2+b-1\land a \in \{0, -3\} \land b \in \{0, 3\} $ \\*
+$ \Leftarrow r>2*y-2*x-a+b-1 \ge 0 $ \\*
+
+\end{document}
