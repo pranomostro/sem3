@@ -28,14 +28,27 @@ let rec find_by_last_name name db = match db with [] -> []
 
 (*****************************************************************************)
 (* Assignment 5.5 [6 Points] *)
-let remove_by_id id db = todo()
+let rec remove_by_id id db = match db with [] -> []
+	| x::xs -> if x.id<>id
+		then x::remove_by_id id xs
+		else remove_by_id id xs
 
-let count_in_semester sem db = todo()
+let rec count_in_semester sem db = match db with [] -> 0
+	| x::xs -> if x.semester=sem
+		then 1+count_in_semester sem xs
+		else count_in_semester sem xs
 
-let student_avg_grade id db = todo()
+let rec student_avg_grade id db = if find_by_id(id, db)=[] || find_by_id(id, db).grades=[]
+	then  grade_sum(find_by_id(id, db).grades)/.list_length(find_by_id(id, db).grades)
+	else 0
+
+let rec list_length l = match l with [] -> 0
+	| x::xs -> 1+list_length l
+
+let rec grade_sum l = match l with [] -> 0
+	| x::xs -> x+.grade_sum xs
 
 let course_avg_grade course db = todo()
-
 
 (*****************************************************************************)
 (* Assignment 5.6 [3 Points] *)
