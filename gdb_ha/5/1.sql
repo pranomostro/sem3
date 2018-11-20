@@ -7,7 +7,7 @@ Studenten s where g.VorlGehoert>=3 and g.MatrNr=s.MatrNr;
 -- b)
 
 select VorlNr, Titel from Vorlesungen v,
-(select Vorgaenger, count(Vorgaenger) as ZahlVorg from voraussetzen group by Vorgaenger) a
+(select Vorgaenger, count(Vorgaenger) as ZahlVorg from voraussetzen group by Vorgaenger) as a
 where SWS>=4 and v.VorlNr=a.Vorgaenger and a.ZahlVorg>=2;
 
 -- c)
@@ -19,3 +19,9 @@ where s.MatrNr=h.MatrNr and h.VorlNr=v.VorlNr and v.gelesenVon=p.PersNr and p.Na
 -- d)
 
 select h.MatrNr, s.MatrNr, Name from hoeren h right outer join studenten s on h.MatrNr=s.MatrNr;
+
+-- Übung
+
+select avg(gehoert) from
+(select studenten.matrnr, count(vorlnr) as gehoert from studenten
+left outer join hoeren on studenten.matrnr, hoeren.matrnr group by studenten.matrnr);

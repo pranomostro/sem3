@@ -6,7 +6,7 @@ select * from Fahrplan where Von like '%Garching%'
 
 select *, (case when Linie like "U%" then "U-Bahn"
 		when Linie like "S%" then "S-Bahn"
-		else "Bus/Tram")
+		else "Bus/Tram" end)
 	from Fahrplan
 
 -- c)
