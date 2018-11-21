@@ -21,7 +21,6 @@ let rec find_by_last_name name db = match db with [] -> []
     then x::find_by_last_name name xs
     else find_by_last_name name xs
 
-
 (*****************************************************************************)
 (**************************** HOMEWORK STARTS HERE ***************************)
 (*****************************************************************************)
@@ -38,34 +37,66 @@ let rec count_in_semester sem db = match db with [] -> 0
 		then 1+count_in_semester sem xs
 		else count_in_semester sem xs
 
-let rec student_avg_grade id db = if find_by_id(id, db)=[] || find_by_id(id, db).grades=[]
-	then  grade_sum(find_by_id(id, db).grades)/.list_length(find_by_id(id, db).grades)
-	else 0
+let list_first l = match l with x::xs -> x
 
 let rec list_length l = match l with [] -> 0
-	| x::xs -> 1+list_length l
+	| x::xs -> 1+list_length xs
 
-let rec grade_sum l = match l with [] -> 0
-	| x::xs -> x+.grade_sum xs
+let rec grade_sum l = match l with [] -> 0.0
+	| (c,g)::xs -> g+.grade_sum xs
 
-let course_avg_grade course db = todo()
+let student_avg_grade id db = let ss=find_by_id id db in
+	if ss=[] || (list_first ss).grades=[]
+	then 0.0
+	else let s=list_first ss in (grade_sum s.grades)/.(float (list_length s.grades))
+
+let rec list_sum l = match l with [] -> 0.0
+	| x::xs -> x+.list_sum xs
+
+let rec find_grade_for_course l c = match l with [] -> 0.0
+	| (s, g)::r -> if s=c then g else find_grade_for_course r c
+
+let rec grades_for_course c db = match db with [] -> []
+	| x::xs -> let g=find_grade_for_course x.grades c in
+	if g=0.0 then grades_for_course c xs else g::grades_for_course c xs
+
+let course_avg_grade course db = let gds=grades_for_course course db in
+	if gds=[] then 0.0 else (list_sum gds)/.float (list_length gds)
 
 (*****************************************************************************)
 (* Assignment 5.6 [3 Points] *)
-let interleave3 l1 l2 l3 = todo()
 
+let rec interleave l1 l2 = match (l1, l2) with ([], ml2) -> ml2
+	| (ml1, []) -> ml1
+	| (x::xs, y::ys) -> x::y::interleave xs ys
+
+let rec interleave3 l1 l2 l3 = match (l1, l2, l3) with ([], ml2, ml3) -> interleave ml2 ml3
+	| (ml1, [], ml3) -> interleave ml1 ml3
+	| (ml1, ml2, []) -> interleave ml1 ml2
+	| (x::xs, y::ys, z::zs) -> x::y::z::interleave3 xs ys zs
 
 (*****************************************************************************)
 (* Assignment 5.7 [3 Points] *)
-let foo x y b = todo()
 
+let rec foorec x y b=if x<y
+	then if b then foorec (x+1) y (not b) else foorec x (y-1) (not b)
+	else x
+
+let foo x y b = if x>y then foorec y x b else foorec x y b
 
 (*****************************************************************************)
 (* Assignment 5.8 [4 Points] *)
-let eval_poly x coeffs = todo()
 
-let derive_poly coeffs = todo()
+let rec pow x n = if n<=0 then 1.0 else x*.pow x (n-1)
 
+let rec eval_poly x coeffs = match coeffs
+	with [] -> 0.0
+	| c::cs -> (c*.(pow x (list_length cs)))+.eval_poly x cs
+
+let rec derive_poly coeffs = match coeffs
+	with [] -> []
+	| c::[] -> []
+	| c::cs -> c*.(float (list_length cs))::derive_poly cs;;
 
 (*****************************************************************************)
 (* Assignment 5.9 [4 Points] *)
