@@ -155,7 +155,7 @@ let () =
   let open List in
   let open Printf in
   let fail l =
-    let line = nth lines l in
+    let line = nth lines (l-1) in
     let test = String.sub line 25 (String.length line - 27) in
     printf "test \027[31;m%s\027[0;m (line %d) failed!\n" test l;
   in
