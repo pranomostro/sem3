@@ -100,8 +100,33 @@ let rec derive_poly coeffs = match coeffs
 
 (*****************************************************************************)
 (* Assignment 5.9 [4 Points] *)
-let lt_seq l = todo()
 
+let rec suffices l=match l
+        with [] -> [[]]
+        | x::xs -> l::(suffices xs)
+
+let rec take l n=match l
+	with [] -> []
+	| x::xs -> if n<=0 then [] else x::(take xs (n-1))
+
+let rec drop l n=match l
+	with [] -> []
+	| x::xs -> if n<=0 then x::(drop xs n) else drop xs (n-1)
+
+let rec matched x y=match x, y
+	with [], y -> []
+	| x, [] -> []
+	| x::xs, y::ys -> if x=y then x::matched xs ys else []
+
+let rec suffixmatches l n=let m=matched (take l n) (drop l n) in
+	if n=(List.length l) then [m] else m::(suffixmatches l (n+1))
+
+let longestsub l=match (List.sort (fun x y -> let xl=List.length x and yl=List.length y in
+	if xl<yl then 1 else if xl>yl then -1 else 0) l) with
+	| [] -> []
+	| x::xs -> x
+
+let lt_seq l=longestsub (List.map (fun l -> longestsub (suffixmatches l 0)) (suffices l))
 
 (*****************************************************************************)
 (**************************** END OF HOMEWORK ********************************)
