@@ -34,10 +34,7 @@ int write_buffer(long thread, char* buffer, int len, int i, Argument* a)
 	{
 		pthread_mutex_lock(&so);
 		while(thread!=highest)
-		{
 			pthread_cond_wait(&ict, &so);
-			pthread_mutex_unlock(&so);
-		}
 	}
 
 	sprintf(outbuf, "[%02d] %03d\t", thread, i);
@@ -107,7 +104,11 @@ int main(int argc, char** argv)
 		{
 		case 'n':
 			a->k=atoi(optarg);
-			break;
+			if(a->k>10)
+			{
+				perror("too many threads required, exiting");
+				exit(1);
+			}
 		case 'l':
 			a->m=LINE;
 			break;

@@ -71,6 +71,11 @@ int main(int argc, char** argv)
 		{
 		case 'n':
 			a->k=atoi(optarg);
+			if(a->k>10)
+			{
+				perror("too many threads required, exiting");
+				exit(1);
+			}
 			break;
 		case 'l':
 			a->m=LINE;
