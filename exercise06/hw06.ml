@@ -7,10 +7,10 @@ type nat = Zero | Succ of nat
 (* 6.6: type definitions *)
 type quadtree_node = NoPoint 
                    | Point of int * int
-                   | Node of quadtree_node (* bottom left *)
-                           * quadtree_node (* top left *)
-                           * quadtree_node (* bottom right *)
-                           * quadtree_node (* top right *)
+                   | QNode of quadtree_node (* bottom left *)
+                            * quadtree_node (* top left *)
+                            * quadtree_node (* bottom right *)
+                            * quadtree_node (* top right *)
 type quadtree = { width:int; height:int; root:quadtree_node }
 
 (* 6.6: utilitiy functions *)
@@ -19,7 +19,7 @@ let print_quadtree filename qtree =
   let file = open_out filename in 
   let rec impl (x1, y1, x2, y2) = function NoPoint -> ()
     | Point (x,y) -> Printf.fprintf file "<circle cx=\"%d\" cy=\"%d\" r=\"1\" fill=\"black\"/>\n" x (qtree.height - y)
-    | Node (nn, np, pn, pp) -> 
+    | QNode (nn, np, pn, pp) -> 
       let xmid = (x1 + x2) / 2 in 
       let ymid = (y1 + y2) / 2 in 
       Printf.fprintf file "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke=\"black\" stroke-width=\"1\"/>\n" 
@@ -148,12 +148,12 @@ let tests = [
   (* tests for 6.6 *)
   __LINE_OF__ (fun () -> (insert_points [5,5]).root = Point (5,5));
   __LINE_OF__ (fun () -> (insert_points [5,5;5,5]).root = Point (5,5));
-  __LINE_OF__ (fun () -> (insert_points [8,2;8,12]).root = Node (NoPoint, NoPoint, Point (8,2), Point (8, 12)));
-  __LINE_OF__ (fun () -> (insert_points [8,8;0,0;8,8]).root = Node (Point (0,0), NoPoint, NoPoint, Point (8, 8)));
-  __LINE_OF__ (fun () -> (insert_points [4,4;12,12]).root = Node (Point (4,4), NoPoint, NoPoint, Point (12,12)));
-  __LINE_OF__ (fun () -> (insert_points [4,4;4,12;12,12]).root = Node (Point (4,4), Point (4, 12), NoPoint, Point (12, 12)));
-  __LINE_OF__ (fun () -> (insert_points [6,6;2,2]).root = Node (Node (Point (2,2), NoPoint, NoPoint, Point (6,6)), NoPoint, NoPoint, NoPoint));
-  __LINE_OF__ (fun () -> (insert_points [2,14;6,11;11,2;14,6]).root = Node (NoPoint, Node (NoPoint, Point (2,14), Point (6, 11), NoPoint), Node (Point (11,2), NoPoint, NoPoint, Point(14,6)), NoPoint));
+  __LINE_OF__ (fun () -> (insert_points [8,2;8,12]).root = QNode (NoPoint, NoPoint, Point (8,2), Point (8, 12)));
+  __LINE_OF__ (fun () -> (insert_points [8,8;0,0;8,8]).root = QNode (Point (0,0), NoPoint, NoPoint, Point (8, 8)));
+  __LINE_OF__ (fun () -> (insert_points [4,4;12,12]).root = QNode (Point (4,4), NoPoint, NoPoint, Point (12,12)));
+  __LINE_OF__ (fun () -> (insert_points [4,4;4,12;12,12]).root = QNode (Point (4,4), Point (4, 12), NoPoint, Point (12, 12)));
+  __LINE_OF__ (fun () -> (insert_points [6,6;2,2]).root = QNode (QNode (Point (2,2), NoPoint, NoPoint, Point (6,6)), NoPoint, NoPoint, NoPoint));
+  __LINE_OF__ (fun () -> (insert_points [2,14;6,11;11,2;14,6]).root = QNode (NoPoint, QNode (NoPoint, Point (2,14), Point (6, 11), NoPoint), QNode (Point (11,2), NoPoint, NoPoint, Point(14,6)), NoPoint));
   (* tests for 6.7 *)
   __LINE_OF__ (fun () -> (eval_expr (Const (2, 3))) =~ (2, 3));
   __LINE_OF__ (fun () -> (eval_expr (UnOp (Neg, Const (4, 5)))) =~ (-4, 5));
