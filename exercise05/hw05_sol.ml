@@ -1,4 +1,3 @@
-let todo _ = failwith "TODO"
 
 (* Existing definitions from tutorial assignments *)
 type student = {
@@ -21,112 +20,108 @@ let rec find_by_last_name name db = match db with [] -> []
     then x::find_by_last_name name xs
     else find_by_last_name name xs
 
+
 (*****************************************************************************)
 (**************************** HOMEWORK STARTS HERE ***************************)
 (*****************************************************************************)
 
 (*****************************************************************************)
 (* Assignment 5.5 [6 Points] *)
-let rec remove_by_id id db = match db with [] -> []
-	| x::xs -> if x.id<>id
-		then x::remove_by_id id xs
-		else remove_by_id id xs
+let rec remove_by_id id db = 
+  match db with [] -> []
+  | x::xs -> if x.id = id then xs else x::remove_by_id id xs
 
-let rec count_in_semester sem db = match db with [] -> 0
-	| x::xs -> if x.semester=sem
-		then 1+count_in_semester sem xs
-		else count_in_semester sem xs
+let rec count_in_semester sem db =
+  match db with [] -> 0
+  | x::xs -> (if x.semester = sem then 1 else 0) + count_in_semester sem xs
 
-let list_first l = match l with x::xs -> x
+let student_avg_grade id db = 
+  let rec list_avg sum n l = 
+    match l with [] -> sum /. n
+    | (_, grade)::xs -> list_avg (sum +. grade) (n +. 1.0) xs
+  in
+  match find_by_id id db with
+  | [{ grades=[] }] -> 0.0
+  | [s] -> list_avg 0.0 0.0 s.grades
+  | _ -> 0.0
 
-let rec list_length l = match l with [] -> 0
-	| x::xs -> 1+list_length xs
+let course_avg_grade course db =
+  let rec iter_grades (sum, n) l =
+    match l with [] -> sum, n
+    | (c,g)::xs -> if c = course then iter_grades (sum +. g, n +. 1.0) xs else iter_grades (sum, n) xs
+  in
+  let rec iter_students (sum, n) l =
+    match l with [] -> (sum, n)
+    | x::xs -> iter_students (iter_grades (sum, n) x.grades) xs
+  in
+  let sum, n = iter_students (0.0, 0.0) db in
+  if n = 0.0 then 0.0 else sum /. n
 
-let rec grade_sum l = match l with [] -> 0.0
-	| (c,g)::xs -> g+.grade_sum xs
-
-let student_avg_grade id db = let ss=find_by_id id db in
-	if ss=[] || (list_first ss).grades=[]
-	then 0.0
-	else let s=list_first ss in (grade_sum s.grades)/.(float (list_length s.grades))
-
-let rec list_sum l = match l with [] -> 0.0
-	| x::xs -> x+.list_sum xs
-
-let rec find_grade_for_course l c = match l with [] -> 0.0
-	| (s, g)::r -> if s=c then g else find_grade_for_course r c
-
-let rec grades_for_course c db = match db with [] -> []
-	| x::xs -> let g=find_grade_for_course x.grades c in
-	if g=0.0 then grades_for_course c xs else g::grades_for_course c xs
-
-let course_avg_grade course db = let gds=grades_for_course course db in
-	if gds=[] then 0.0 else (list_sum gds)/.float (list_length gds)
 
 (*****************************************************************************)
-(* Assignment 5.6 [3 Points] *)
+(* Assignment 5.6 [2 Points] *)
+let rec interleave3 l1 l2 l3 =
+  let rec interleave2 l1 l2 =
+    match l1 with [] -> l2
+    | x::xs -> x::interleave2 l2 xs
+  in
+  match l1 with [] -> interleave2 l2 l3
+  | x::xs -> x::interleave3 l2 l3 xs
 
-let rec interleave l1 l2 = match (l1, l2) with ([], ml2) -> ml2
-	| (ml1, []) -> ml1
-	| (x::xs, y::ys) -> x::y::interleave xs ys
-
-let rec interleave3 l1 l2 l3 = match (l1, l2, l3) with ([], ml2, ml3) -> interleave ml2 ml3
-	| (ml1, [], ml3) -> interleave ml1 ml3
-	| (ml1, ml2, []) -> interleave ml1 ml2
-	| (x::xs, y::ys, z::zs) -> x::y::z::interleave3 xs ys zs
 
 (*****************************************************************************)
-(* Assignment 5.7 [3 Points] *)
+(* Assignment 5.7 [2 Points] *)
+let foo x y b =
+  let x,y = if x > y then y,x else x,y in
+  let rec loop x y b =
+    if x >= y then x
+    else if b then loop (x+1) y (not b)
+    else loop x (y-1) (not b)
+  in
+  loop x y b
 
-let rec foorec x y b=if x<y
-	then if b then foorec (x+1) y (not b) else foorec x (y-1) (not b)
-	else x
-
-let foo x y b = if x>y then foorec y x b else foorec x y b
 
 (*****************************************************************************)
 (* Assignment 5.8 [4 Points] *)
+let eval_poly x coeffs =
+  let rec impl value coeffs =
+    match coeffs with [] -> value
+    | c::cs -> impl ((value *. x) +. c) cs
+  in
+  impl 0.0 coeffs
 
-let rec pow x n = if n<=0 then 1.0 else x*.pow x (n-1)
+let derive_poly coeffs = 
+  let rec impl = function [] | [_] -> ([], 0.)
+  | c::cs -> let (new_coeffs, deg) = impl cs in
+    (c *. (deg +. 1.))::new_coeffs, deg +. 1.
+  in fst (impl coeffs)
 
-let rec eval_poly x coeffs = match coeffs
-	with [] -> 0.0
-	| c::cs -> (c*.(pow x (list_length cs)))+.eval_poly x cs
-
-let rec derive_poly coeffs = match coeffs
-	with [] -> []
-	| c::[] -> []
-	| c::cs -> c*.(float (list_length cs))::derive_poly cs;;
 
 (*****************************************************************************)
-(* Assignment 5.9 [4 Points] *)
+(* Assignment 5.9 [6 Points] *)
+let lt_seq l = 
+  (* compare the first up to n elements of l1 and l2 to find the longest common prefix, not longer than n *)
+  let rec longest_prefix n l1 l2 =
+    if n <= 0 then [], 0 else
+    match l1, l2 with x::xs, y::ys ->
+      if x <> y then [], 0 else
+      let l,n = longest_prefix (n-1) xs ys in
+      (x::l, n+1)
+    | _ -> [], 0
+  in
+  (* iterate through the list l2 and compare it with l1 *)
+  let rec iter_l2 n l1 l2 (best_l, best_n) =
+    match l2 with [] -> (best_l, best_n)
+    | y::ys -> let pre_l, pre_n = longest_prefix n l1 l2 in
+      iter_l2 (n+1) l1 ys (if pre_n > best_n then (pre_l, pre_n) else (best_l, best_n))
+  in
+  (* iterate through the list l1 *)
+  let rec iter_l1 l1 (best_l, best_n) =
+    match l1 with [] -> best_l
+    | x::xs -> iter_l1 xs (iter_l2 1 l1 xs (best_l, best_n))
+  in iter_l1 l ([], 0)
 
-let rec suffices l=match l
-        with [] -> [[]]
-        | x::xs -> l::(suffices xs)
 
-let rec take l n=match l
-	with [] -> []
-	| x::xs -> if n<=0 then [] else x::(take xs (n-1))
-
-let rec drop l n=match l
-	with [] -> []
-	| x::xs -> if n<=0 then x::(drop xs n) else drop xs (n-1)
-
-let rec matched x y=match x, y
-	with [], y -> []
-	| x, [] -> []
-	| x::xs, y::ys -> if x=y then x::matched xs ys else []
-
-let rec suffixmatches l n=let m=matched (take l n) (drop l n) in
-	if n=(List.length l) then [m] else m::(suffixmatches l (n+1))
-
-let longestsub l=match (List.sort (fun x y -> let xl=List.length x and yl=List.length y in
-	if xl<yl then 1 else if xl>yl then -1 else 0) l) with
-	| [] -> []
-	| x::xs -> x
-
-let lt_seq l=longestsub (List.map (fun l -> longestsub (suffixmatches l 0)) (suffices l))
 
 (*****************************************************************************)
 (**************************** END OF HOMEWORK ********************************)
