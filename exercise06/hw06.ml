@@ -80,33 +80,40 @@ let print_tree filename btree =
 (**************************** HOMEWORK STARTS HERE ***************************)
 (*****************************************************************************)
 (* Assignment 6.5 [3 points] *)
-let int_to_nat = todo
+let rec int_to_nat i = if i=0 then Zero else Succ (int_to_nat (i-1))
 
-let nat_to_int = todo
+let rec nat_to_int n = match n with
+	| Succ x -> 1+nat_to_int x
+	| Zero -> 0
 
-let add = todo
+let rec add n1 n2 = match n1, n2 with
+	| Succ x1, x2 -> Succ (add x1 x2)
+	| Zero, x2 -> x2
 
-let mul = todo
+let rec mul n1 n2 = match n1, n2 with
+	| Zero, x2 -> Zero
+	| Succ x1, x2 -> add (mul x1 x2) x2
 
-let pow = todo
+let rec pow n1 n2 = match n1, n2 with
+	| x1, Zero -> Succ Zero
+	| x1, Succ x2 -> mul x1 (pow x1 x2)
 
-let leq = todo
-
+let rec leq n1 n2 = match n1, n2 with
+	| Zero, _ -> true
+	| Succ x1, Zero -> false
+	| Succ x1, Succ x2 -> leq x1 x2
 
 (*****************************************************************************)
 (* Assignment 6.6 [6 points] *)
 let insert = todo
 
-
 (*****************************************************************************)
 (* Assignment 6.6 [4 points] *)
 let eval_expr = todo
 
-
 (*****************************************************************************)
 (* Assignment 6.8 [7 points] *)
 let crawl = todo
-
 
 (*****************************************************************************)
 (**************************** END OF HOMEWORK ********************************)
