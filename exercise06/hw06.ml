@@ -105,7 +105,35 @@ let rec leq n1 n2 = match n1, n2 with
 
 (*****************************************************************************)
 (* Assignment 6.6 [6 points] *)
-let insert = todo
+(* Insert Point p (int * int) into quadtree qt *)
+
+let between : int * int -> int * int -> int * int -> bool =
+	fun b t p -> match b, p, t with
+	| (a, b), (p1, p2), (c, d) -> a<=p1 && p1<=c && b<=p2 && p2<=d
+
+let rec traverse : int * int -> int * int -> quadtree_node -> int * int -> quadtree_node =
+	fun b t qtn p -> match b, t with
+	| (bx, by), (tx, ty) -> let lb=(bx, by) and lm=(bx, (by+ty)/2)
+		and mb=((bx+tx)/2, by) and mm=((bx+tx)/2, (by+ty)/2)
+		and mt=((bx+tx)/2, ty) and rm=(tx, (by+ty)/2)
+		and rt=(tx, ty)
+	in
+		match qtn with
+		| NoPoint -> let (p1, p2)=p in Point (p1, p2)
+		| Point (t1, t2) -> if between lb mm (t1, t2) then
+				traverse b t (QNode (Point (t1, t2), NoPoint, NoPoint, NoPoint)) p else
+			if between lm mt (t1, t2) then 
+				traverse b t (QNode (NoPoint, Point (t1, t2), NoPoint, NoPoint)) p else
+			if between mb rm (t1, t2) then
+				traverse b t (QNode (NoPoint, NoPoint, Point (t1, t2), NoPoint)) p else
+			traverse b t (QNode (NoPoint, NoPoint, NoPoint, Point (t1,  t2))) p
+		| QNode (a, b, c, d) -> if between lb mm p then QNode ((traverse lb mm a p), b, c, d) else
+			if between lm mt p then QNode (a, (traverse lm mt b p), c, d) else
+			if between mb rm p then QNode (a, b, (traverse mb rm c p), d) else
+			QNode (a, b, c, (traverse mm rt d p))
+
+let insert : int * int -> quadtree -> quadtree =
+	fun p qt -> {width=qt.width; height=qt.height; root=(traverse (0, 0) (qt.width, qt.height) qt.root p)}
 
 (*****************************************************************************)
 (* Assignment 6.6 [4 points] *)
