@@ -4,7 +4,7 @@
 
 #define MAX_SZ 1024
 
-extern bool parse(char* str);
+extern bool parse(char* str, char** envp);
 
 int main (int argc, char** argv, char** envp) {
     while (true) {
@@ -22,7 +22,7 @@ int main (int argc, char** argv, char** envp) {
             }
         }
 
-        if (!parse(buf)) {
+        if (!parse(buf, envp)) {
             break;
         }
 

@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "list.h"
 
@@ -11,13 +12,15 @@ void p(char* s) {
     puts(s);
 }
 
-bool parse(char* str) {
+bool parse(char* str, char** envp) {
     int len = strlen(str);
-    
+    if (len == 0) {
+        return true;
+    }
+
+    parserState restore = none;
     parserState state = none;
     bool backslash = false;
-
-    // char* buf = malloc(len * sizeof(char));
 
     list_t* paramList = list_init();
     if (paramList == NULL) {
@@ -25,15 +28,36 @@ bool parse(char* str) {
         exit(-1);
     }
 
-    char buf[len];
+    char* buf = malloc(len * sizeof(char));
+    int bufLen = len;
     int i = 0;
+    
+    char envBuf[len];
+    int ei = 0;
 
     for (char* c = str; *c != '\0'; c++) {
+        // printf("%x %c %d\n", (unsigned int) c, *c, state);
         char cur = *c;
+
+        if (backslash) {
+            buf[i++] = cur;
+            backslash = false;
+            continue;
+        }
+
+        if (cur == '\\') {
+            backslash = true;
+            continue;
+        }
+
         switch (state) {
             case dQuote:
                 if (cur == '"') {
                     state = none;
+                    continue;
+                } else if (cur == '$') {
+                    restore = state;
+                    state = dollar;
                     continue;
                 }
 
@@ -44,19 +68,41 @@ bool parse(char* str) {
                 if (cur == '\'') {
                     state = none;
                     continue;
+                } else if (cur == '$') {
+                    restore = state;
+                    state = dollar;
+                    continue;
                 }
 
                 buf[i++] = cur;
 
                 break;
             case dollar:
-                break;
-            case none: 
-                if (backslash) {
-                    buf[i++] = cur;
-                    backslash = false;
+                if (!(isupper(cur)|| isdigit(cur) || cur == '_')) {
+                    envBuf[ei] = '\0';
+                    char* envVar = getenv(envBuf);
+                    
+                    // Expand buf when too small
+                    int envLen = strlen(envVar);
+                    if (envLen + i + 1>= bufLen) {
+                        buf = realloc(buf, envLen + i + 1);
+                    }
+
+                    // Copy into buf
+                    strncpy(&buf[i], envVar, envLen);
+                    i += envLen;
+                    
+                    // Reset
+                    ei = 0;
+                    // Reevaluate current character
+                    c--;
+                    state = restore;
                     continue;
                 }
+
+                envBuf[ei++] = cur;
+                break;
+            case none: 
                 switch (cur) {
                     case '"':
                         state = dQuote;
@@ -65,10 +111,8 @@ bool parse(char* str) {
                         state = quote;
                         break;
                     case '$':
+                        restore = state;
                         state = dollar;
-                        break;
-                    case '\\':
-                        backslash = true;
                         break;
                     case ' ': // Finish one param
                         if (i == 0) {
@@ -101,9 +145,23 @@ bool parse(char* str) {
         case quote:
             perror("Unclosed '\n");
             exit(-1);
-        case dollar:
-            //perror("Unused $\n");
-            //exit(-1);
+        case dollar: {
+            envBuf[ei] = '\0';
+            char* envVar = getenv(envBuf);      
+            
+            // Expand buf when too small
+            int envLen = strlen(envVar);
+            if (envLen + i + 1 >= bufLen) {
+                buf = realloc(buf, envLen + i + 1);
+            }
+            
+            // Copy into buf
+            strcpy(&buf[i], envVar);
+            // hexDump("buf", buf, envLen+i+1);
+            char* param = strdup(buf);
+            list_append(paramList, param);
+            break;
+        }
         case none:
             if (backslash) {
                 perror("Unused \\\n");
@@ -123,7 +181,12 @@ bool parse(char* str) {
             exit(-1);
     }
 
+    free(buf);
     list_print(paramList, p);
+
+    if(paramList->first == NULL) {
+        return true;
+    }
 
     return strcmp(paramList->first->data, "exit") != 0;
 }
