@@ -1,0 +1,34 @@
+P1:
+
+concurrent_begin
+	r1=a-b
+	r2=c+d
+	r3=e-f
+concurrent_end
+
+P2:
+
+concurrent_begin
+	r1=a-b
+	r2=c+d
+	r3=e-f
+concurrent_end
+
+r4=r1*r2
+
+r5=r4/r3
+
+concurrent_begin
+	r6=v+w
+	r7=r-t
+	r8=q+p
+concurrent_end
+
+concurrent_begin
+	r9=u/r6
+	r10=r8/h
+concurrent_end
+
+r11=r9*r7
+
+r12=r11*r10

@@ -1,0 +1,42 @@
+\newfam\bbbfam
+\font\bbbten=msbm10
+\font\bbbseven=msbm7
+\font\bbbfive=msbm5
+\textfont\bbbfam=\bbbten
+\scriptfont\bbbfam=\bbbseven
+\scriptscriptfont\bbbfam=\bbbfive
+\def\bbb{\fam=\bbbfam}
+
+z.Z.: $ (1+x)^n \ge 1+n*x $, $x>-1, n \in \bbb{N} $
+
+Induktionsbasis: $ (1+x)^0 \ge 1+0*x \equiv 1=1 $
+
+Induktionsannahme: $ (1+x)^n \ge 1+n*x $
+
+Induktionsschritt: z.Z.: $ (1+x)^{n+1} \ge 1+(n+1)*x $
+
+$$ (1+x)^n*(1+x) \ge 1+n*x+x $$
+$$ (1+x)^n \ge {1+x+n*x \over 1+x } $$
+$$ (1+x)^n \ge {1+x \over 1+x}+{n*x \over 1+x} $$
+$$ (1+x)^n \ge 1+{n*x \over 1+x} $$
+
+z.Z.:
+
+$$ 1+n*x \ge 1+{n*x \over 1+x} $$
+$$ n*x \ge {n*x \over 1+x} $$
+
+Im Fall $n*x \ge 0$ (also $x \ge 0$) gilt:
+
+$$ 1 \ge {1 \over 1+x} $$
+$$ 1+x \ge 1 $$
+
+Wahr f\"{u}r $x \ge 0$.
+
+Im Fall $n*x < 0$ (also $x<0$) gilt:
+
+$$ 1 \le {1 \over 1+x} $$
+$$ 1+x \le 1 $$
+
+Wahr f\"{u}r $-1<x<0$.
+
+\bye
