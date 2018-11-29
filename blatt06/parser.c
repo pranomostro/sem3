@@ -184,9 +184,20 @@ bool parse(char* str, char** envp) {
     free(buf);
     list_print(paramList, p);
 
-    if(paramList->first == NULL) {
+    if (paramList->first == NULL) {
         return true;
     }
 
-    return strcmp(paramList->first->data, "exit") != 0;
+    bool ret = strcmp(paramList->first->data, "exit") != 0;
+    // Free paramList
+    while (paramList->first != NULL) {
+        free(paramList->first->data);
+        list_remove(paramList, paramList->first);
+    }
+
+    list_finit(paramList);
+
+    free(paramList);
+
+    return ret;
 }
