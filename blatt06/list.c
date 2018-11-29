@@ -136,3 +136,19 @@ void list_print(list_t *list, void (*print_elem) (char *)) {
 		print_elem(le->data);
 	}
 }
+
+char **list_to_array(list_t *list) {
+	char** array = malloc((list->size + 1) * sizeof(char*));
+	
+	struct list_elem* nel = list->first;
+
+	int i = 0;
+	while(nel != NULL) {
+		array[i++] = nel->data;
+		nel = nel->next;
+	}
+
+	// Terminate with NULL
+	array[i] = NULL;
+	return array;
+}
