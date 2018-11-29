@@ -71,7 +71,11 @@ bool parse(char* str, list_t* paramList, char** envp) {
                 if (!(isupper(cur)|| isdigit(cur) || cur == '_')) {
                     envBuf[ei] = '\0';
                     char* envVar = getenv(envBuf);
-                    
+                    if (envVar == NULL) {
+                        printf("Unset environment variable: %s\n", envBuf);
+                        exit(-1);
+                    }
+
                     // Expand buf when too small
                     int envLen = strlen(envVar);
                     if (envLen + i + 1>= bufLen) {
@@ -81,7 +85,6 @@ bool parse(char* str, list_t* paramList, char** envp) {
                     // Copy into buf
                     strncpy(&buf[i], envVar, envLen);
                     i += envLen;
-                    
                     // Reset
                     ei = 0;
                     // Reevaluate current character
@@ -138,7 +141,11 @@ bool parse(char* str, list_t* paramList, char** envp) {
         case dollar: {
             envBuf[ei] = '\0';
             char* envVar = getenv(envBuf);      
-            
+            if (envVar == NULL) {
+                printf("Unset environment variable: %s\n", envBuf);
+                exit(-1);
+            }
+
             // Expand buf when too small
             int envLen = strlen(envVar);
             if (envLen + i + 1 >= bufLen) {
