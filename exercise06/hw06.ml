@@ -109,39 +109,68 @@ let rec leq n1 n2 = match n1, n2 with
 
 let between : int * int -> int * int -> int * int -> bool =
 	fun b t p -> match b, p, t with
-	| (a, b), (p1, p2), (c, d) -> a<=p1 && p1<=c && b<=p2 && p2<=d
+	| (a, b), (p1, p2), (c, d) -> a<=p1 && p1<c && b<=p2 && p2<d
 
-let rec traverse : int * int -> int * int -> quadtree_node -> int * int -> quadtree_node =
+let rec trav : int * int -> int * int -> quadtree_node -> int * int -> quadtree_node =
 	fun b t qtn p -> match b, t with
-	| (bx, by), (tx, ty) -> let lb=(bx, by) and lm=(bx, (by+ty)/2)
-		and mb=((bx+tx)/2, by) and mm=((bx+tx)/2, (by+ty)/2)
-		and mt=((bx+tx)/2, ty) and rm=(tx, (by+ty)/2)
-		and rt=(tx, ty)
+	| (bx, by), (tx, ty) ->
+		let lb=(bx, by) and lm=(bx, (by+ty)/2) and mb=((bx+tx)/2, by)
+		and mm=((bx+tx)/2, (by+ty)/2) and mt=((bx+tx)/2, ty)
+		and rm=(tx, (by+ty)/2) and rt=(tx, ty)
+		and (p1, p2)=p
 	in
 		match qtn with
-		| NoPoint -> let (p1, p2)=p in Point (p1, p2)
-		| Point (t1, t2) -> if between lb mm (t1, t2) then
-				traverse b t (QNode (Point (t1, t2), NoPoint, NoPoint, NoPoint)) p else
-			if between lm mt (t1, t2) then 
-				traverse b t (QNode (NoPoint, Point (t1, t2), NoPoint, NoPoint)) p else
-			if between mb rm (t1, t2) then
-				traverse b t (QNode (NoPoint, NoPoint, Point (t1, t2), NoPoint)) p else
-			traverse b t (QNode (NoPoint, NoPoint, NoPoint, Point (t1,  t2))) p
-		| QNode (a, b, c, d) -> if between lb mm p then QNode ((traverse lb mm a p), b, c, d) else
-			if between lm mt p then QNode (a, (traverse lm mt b p), c, d) else
-			if between mb rm p then QNode (a, b, (traverse mb rm c p), d) else
-			QNode (a, b, c, (traverse mm rt d p))
+		| NoPoint -> Point (p1, p2)
+		| Point (t1, t2) ->
+			let mat=Point (t1, t2) in
+			if (t1, t2)=(p1, p2) then mat else
+			if between lb mm (t1, t2) then trav b t (QNode (mat, NoPoint, NoPoint, NoPoint)) p else
+			if between lm mt (t1, t2) then trav b t (QNode (NoPoint, mat, NoPoint, NoPoint)) p else
+			if between mb rm (t1, t2) then trav b t (QNode (NoPoint, NoPoint, mat, NoPoint)) p else
+			trav b t (QNode (NoPoint, NoPoint, NoPoint, mat)) p
+		| QNode (a, b, c, d) ->
+			if between lb mm p then QNode ((trav lb mm a p), b, c, d) else
+			if between lm mt p then QNode (a, (trav lm mt b p), c, d) else
+			if between mb rm p then QNode (a, b, (trav mb rm c p), d) else
+			QNode (a, b, c, (trav mm rt d p))
 
 let insert : int * int -> quadtree -> quadtree =
-	fun p qt -> {width=qt.width; height=qt.height; root=(traverse (0, 0) (qt.width, qt.height) qt.root p)}
+	fun p qt -> {width=qt.width; height=qt.height; root=(trav (0, 0) (qt.width, qt.height) qt.root p)}
 
 (*****************************************************************************)
 (* Assignment 6.6 [4 points] *)
-let eval_expr = todo
+
+let rec gcd a b=match a, b with
+	| m, 0 -> m
+	| 0, n -> n
+	| m, n -> if m>n then gcd (m mod n) n else gcd m (n mod m)
+
+let sfy r = let (n, d)=r in let cd=gcd (abs n) (abs d) in (n/cd, d/cd)
+
+let rec eval_expr e = match e with
+	| Const r -> r
+	| UnOp (Neg, e) -> let (n, d) = eval_expr e in (-n, d)
+	| BinOp (o, e1, e2) -> let (n1, d1) = eval_expr e1 and (n2, d2) = eval_expr e2 in match o with
+		| Add -> let r=((n1*d2)+(n2*d1), d1*d2) in sfy r
+		| Sub -> let r=((n1*d2)-(n2*d1), d1*d2) in sfy r
+		| Mul -> (n1*n2, d1*d2)
+		| Div -> (n1*d2, n2*d1)
 
 (*****************************************************************************)
 (* Assignment 6.8 [7 points] *)
-let crawl = todo
+(*let rec crawl cl t = todo*)
+
+let appc ml c = match c with
+	| Left -> Left::ml
+	| Right -> Right::ml
+	| Up -> let m::mlr=ml in mlr
+	| _ -> ml
+
+let rec crawlrec cl ml t s = match cl with
+	| [] -> t
+	| c::clr -> clr
+
+let crawl cl t = crawlrec cl [] t []
 
 (*****************************************************************************)
 (**************************** END OF HOMEWORK ********************************)
