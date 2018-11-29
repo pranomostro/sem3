@@ -140,7 +140,7 @@ void list_print(list_t *list, void (*print_elem) (char *)) {
 }
 
 char **list_to_array(list_t *list) {
-	printf("%ld %ld %ld\n", list->size, sizeof(char*), (list->size + 1) * sizeof(char*));
+	// printf("%ld %ld %ld\n", list->size, sizeof(char*), (list->size + 1) * sizeof(char*));
 	char** array = malloc((list->size + 1) * sizeof(char*));
 	
 	struct list_elem* nel = list->first;

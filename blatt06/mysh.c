@@ -28,10 +28,11 @@ int main (int argc, char** argv, char** envp) {
         exit(-1);
     }
 
-    char* path = strdup(getenv("PATH"));
+    char* path = getenv("PATH");
 
     while (true) {
         printf("$ ");
+        fflush(stdout);
         char* buf = malloc(MAX_SZ * sizeof(char));
         if (buf == NULL) {
             perror("Cannot allocate buffer\n");
@@ -55,8 +56,12 @@ int main (int argc, char** argv, char** envp) {
 
         free(buf);
 
-        if (paramList->first != NULL) {
+        if (paramList->first != NULL && !stop) {
             char** args = list_to_array(paramList);
+            /*char* args[3];
+            args[0] = paramList->first->data;
+            args[1] = "Hello";
+            args[2] = NULL;*/
             pid_t pid = fork();
             switch (pid) {
                 case -1:
@@ -64,7 +69,29 @@ int main (int argc, char** argv, char** envp) {
                     exit(-1);
                 case 0:
                     // Child
-                    execve(args[0], args, envp);
+                    if (strchr(args[0], '/') != NULL) {
+                        execve(args[0], args, envp);
+                    } else {
+                        int comLen = strlen(args[0]);
+                        char* tokPath = strdup(path);
+                        char* tok = strtok(tokPath, ":");
+                        while (tok != NULL) {
+                            // printf("%d\n", strlen(tok) + comLen + 2);
+                            char* withCom = strdup(tok);
+                            char* tmp = realloc(withCom, strlen(withCom) + comLen + 2);
+                            if (tmp != NULL) {
+                                withCom = tmp;
+                            } else {
+                                exit(-1);
+                            }
+                            withCom = strcat(strcat(withCom, "/"), args[0]);
+                            // puts(withCom);
+                            execve(withCom, args, envp);
+                            // puts("Not this");
+                            free(withCom);
+                            tok = strtok(NULL, ":");
+                        }
+                    }
                     perror("Command not found");
                     exit(-1);
                 default: {
@@ -77,16 +104,18 @@ int main (int argc, char** argv, char** envp) {
             }
         }
 
+        if (!stop) {
+            pid_t retPid = wait(NULL);
+            // puts("Join");
+            process retProc = {retPid};
+            struct list_elem* inList = list_find(processList, (char*) &retProc, cmpPid);
+            free(inList->data);
+            list_remove(processList, inList);
+        }
+
         // Free paramList
         list_finit(paramList);
         free(paramList);
-
-        pid_t retPid = wait(NULL);
-        process retProc = {retPid};
-        struct list_elem* inList = list_find(processList, (char*) &retProc, cmpPid);
-        free(inList->data);
-        list_remove(processList, inList);
-
 
         if (stop) {
             break;
