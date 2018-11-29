@@ -8,11 +8,7 @@
 
 typedef enum parserState {dQuote, quote, dollar, none} parserState;
 
-void p(char* s) {
-    puts(s);
-}
-
-bool parse(char* str, char** envp) {
+bool parse(char* str, list_t* paramList, char** envp) {
     int len = strlen(str);
     if (len == 0) {
         return true;
@@ -21,12 +17,6 @@ bool parse(char* str, char** envp) {
     parserState restore = none;
     parserState state = none;
     bool backslash = false;
-
-    list_t* paramList = list_init();
-    if (paramList == NULL) {
-        perror("Cannot allocate list\n");
-        exit(-1);
-    }
 
     char* buf = malloc(len * sizeof(char));
     int bufLen = len;
@@ -182,22 +172,10 @@ bool parse(char* str, char** envp) {
     }
 
     free(buf);
-    list_print(paramList, p);
 
     if (paramList->first == NULL) {
         return true;
     }
 
-    bool ret = strcmp(paramList->first->data, "exit") != 0;
-    // Free paramList
-    while (paramList->first != NULL) {
-        free(paramList->first->data);
-        list_remove(paramList, paramList->first);
-    }
-
-    list_finit(paramList);
-
-    free(paramList);
-
-    return ret;
+    return strcmp(paramList->first->data, "exit") != 0;
 }

@@ -2,9 +2,15 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "list.h"
+
 #define MAX_SZ 1024
 
-extern bool parse(char* str, char** envp);
+extern bool parse(char* str, list_t* paramList, char** envp);
+
+void p(char* s) {
+    puts(s);
+}
 
 int main (int argc, char** argv, char** envp) {
     while (true) {
@@ -22,11 +28,31 @@ int main (int argc, char** argv, char** envp) {
             }
         }
 
-        if (!parse(buf, envp)) {
-            break;
+        list_t* paramList = list_init();
+        if (paramList == NULL) {
+            perror("Cannot allocate list\n");
+            exit(-1);
         }
 
+        bool stop = !parse(buf, paramList, envp);
+
         free(buf);
+
+        list_print(paramList, p);
+
+        // Free paramList
+        while (paramList->first != NULL) {
+            free(paramList->first->data);
+            list_remove(paramList, paramList->first);
+        }
+
+        list_finit(paramList);
+
+        free(paramList);
+
+        if (stop) {
+            break;
+        }
     }
 
     return 0;
