@@ -17,7 +17,7 @@ int main (int argc, char** argv, char** envp) {
         printf("$ ");
         char* buf = malloc(MAX_SZ * sizeof(char));
         if (buf == NULL) {
-            perror("Cannot allocate buffer\n");
+            perror("Cannot allocate buffer");
             exit(-1);
         }
         fgets(buf, MAX_SZ, stdin);
@@ -30,7 +30,7 @@ int main (int argc, char** argv, char** envp) {
 
         list_t* paramList = list_init();
         if (paramList == NULL) {
-            perror("Cannot allocate list\n");
+            perror("Cannot allocate list");
             exit(-1);
         }
 

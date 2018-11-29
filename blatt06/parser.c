@@ -123,17 +123,17 @@ bool parse(char* str, list_t* paramList, char** envp) {
                 }
                 break;
             default:
-                perror("Unexpected state\n");
+                perror("Unexpected state");
                 exit(-1);
         }
     }
 
     switch (state) {
         case dQuote:
-            perror("Unclosed \"\n");
+            perror("Unclosed \"");
             exit(-1);
         case quote:
-            perror("Unclosed '\n");
+            perror("Unclosed '");
             exit(-1);
         case dollar: {
             envBuf[ei] = '\0';
@@ -154,7 +154,7 @@ bool parse(char* str, list_t* paramList, char** envp) {
         }
         case none:
             if (backslash) {
-                perror("Unused \\\n");
+                perror("Unused \\");
                 exit(-1);
             }
             // Finish one param
@@ -167,7 +167,7 @@ bool parse(char* str, list_t* paramList, char** envp) {
             }
             break;
         default:
-            perror("Unexpected state\n");
+            perror("Unexpected state");
             exit(-1);
     }
 
