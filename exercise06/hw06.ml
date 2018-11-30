@@ -160,15 +160,41 @@ let rec eval_expr e = match e with
 (* Assignment 6.8 [7 points] *)
 (*let rec crawl cl t = todo*)
 
-let appc ml c = match c with
+let appmc : command list -> command -> command list =
+	fun ml c -> match c with
 	| Left -> Left::ml
 	| Right -> Right::ml
 	| Up -> let m::mlr=ml in mlr
 	| _ -> ml
 
-let rec crawlrec cl ml t s = match cl with
+let appcc : command -> tree -> tree list -> tree * tree list =
+	fun c t s ->
+	match c with
+	| New n -> (Node (n, Empty, Empty)), s
+	| Delete -> Empty, s
+	| Push -> t, t::s
+	| Pop -> let sb::sr=s in sb, sr
+	| _ -> failwith "No movements allowed in appcc"
+
+let rec execon : command -> command list -> tree -> tree list -> tree * tree list =
+	fun c ml t s ->
+	match ml with
+	| [] -> appcc c t s
+	| m::mlr ->
+		match m, t with
+		| _, Empty -> failwith "No movement allowed on Empty"
+		| (Up|Delete|Push|Pop|New _), Node (_, _, _) -> failwith "Non movement in movement list"
+		| Left, Node (v, tl, tr) -> let nt, ns=execon c mlr tl s in Node (v, nt, tr), ns
+		| Right, Node (v, tl, tr) -> let nt, ns=execon c mlr tr s in Node (v, tl, nt), ns
+
+let rec crawlrec : command list -> command list -> tree -> tree list -> tree =
+	fun cl ml t s -> match cl with
 	| [] -> t
-	| c::clr -> clr
+	| c::clr -> let nml=appmc ml c in match c with
+		| Left -> crawlrec clr nml t s
+		| Right -> crawlrec clr nml t s
+		| Up -> crawlrec clr nml t s
+		| _ -> let nt, ns=execon c (List.rev ml) t s in crawlrec clr ml nt ns
 
 let crawl cl t = crawlrec cl [] t []
 
