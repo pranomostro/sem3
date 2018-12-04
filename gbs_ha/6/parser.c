@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "list.h"
 
@@ -11,36 +12,65 @@ typedef int Parsestate;
 
 void parse(list_t* l, char* in, char** env)
 {
-	size_t i, j=0;
+	size_t i, j=0, nd, ei, cap;
 	char* arg=NULL;
 	Parsestate state=START, laststate=START;
 
 	for(i=0; in[i]!='\0';)
 	{
-		printf("state: %d\t laststate: %d\t arg: \"%s\"\t in: \"%s\" \ti: %ld\t j:%ld\n", state, laststate, arg, in, i, j);
+/*
+		printf("state: ");
+		switch(state)
+		{
+		case START: printf("START "); break;
+		case END: printf("END "); break;
+		case LITERAL: printf("LITERAL "); break;
+		case SQUOTED: printf("SQUOTED "); break;
+		case DQUOTED: printf("DQUOTED "); break;
+		case VAR: printf("VAR "); break;
+		case ESCAPED: printf("ESCAPED "); break;
+		case WHITE: printf("WHITE "); break;
+		default: break;
+		}
+
+		printf("\t laststate: %d\t arg: \"%s\"\t in: \"%s\" \ti: %ld\t j:%ld\n", laststate, arg, in+i, i, j);
+*/
+
 		switch(state)
 		{
 		case START:
 			if(in[i]=='\'')
+			{
 				state=SQUOTED;
+				i++;
+			}
 			else if(in[i]=='"')
+			{
 				state=DQUOTED;
+				i++;
+			}
 			else if(in[i]=='\\')
 			{
 				laststate=LITERAL;
 				state=ESCAPED;
+				i++;
 			}
 			else if(in[i]=='$')
 			{
 				laststate=LITERAL;
 				state=VAR;
+				i++;
 			}
 			else if(in[i]==' '||in[i]=='\t')
+			{
 				state=WHITE;
+				i++;
+			}
 			else
 				state=LITERAL;
 			arg=(char*)malloc(sizeof(char)*MAX_ARG_SZ);
 			j=0;
+			cap=MAX_ARG_SZ;
 			break;
 		case END:
 			break;
@@ -57,144 +87,130 @@ void parse(list_t* l, char* in, char** env)
 				state=VAR;
 				laststate=LITERAL;
 			}
-			else if(in[i]==' '||in[i]=='\t')
+			else if(in[i]==' ')
+			{
 				state=WHITE;
+				arg[j]='\0';
+				list_append(l, arg);
+			}
 			else
 				arg[j++]=in[i];
 			i++;
 
-			if(in[i]==' '||in[i]=='\t')
-			{
-				state=WHITE;
-				list_append(l, arg);
-			}
-			else if(in[i]=='\0')
+			if(state==LITERAL&&in[i]=='\0')
 			{
 				state=END;
+				arg[j]='\0';
 				list_append(l, arg);
 			}
 			break;
 		case SQUOTED:
-			break;
-		case DQUOTED:
-			break;
-		case VAR:
-			break;
-		case ESCAPED:
-			break;
-		case WHITE:
-			break;
-		default:
-			break;
-		}
-
-	}
-}
-
-void parse2(list_t* l, char* in, char** env)
-{
-	size_t i, j=0;
-	char* arg=NULL;
-	Parsestate state=WHITE, laststate=WHITE;
-
-	for(i=0; in[i]!='\0';)
-	{
-		printf("laststate: %d, state: %d, arg: \"%s\",\t in: \"%s\",\t i: %ld, j: %ld\n", laststate, state, arg, in+i, i, j);
-		switch(state)
-		{
-		case LITERAL:
-			if(in[i]=='\\')
+			if(in[i]=='\'')
 			{
-				laststate=LITERAL;
-				state=ESCAPED;
+				if(in[i+1]=='\0')
+				{
+					arg[j]='\0';
+					list_append(l, arg);
+					state=END;
+				}
+				else if(in[i+1]==' ')
+				{
+					arg[j]='\0';
+					list_append(l, arg);
+					state=WHITE;
+				}
+				else
+					state=LITERAL;
+				i++;
+				break;
 			}
-			else if(in[i+1]=='\0'||in[i+1]==' '||in[i]=='\t')
+			else if(in[i]=='\\')
 			{
-				arg[j]=in[i];
-				j++;
-				arg[j]='\0';
-				list_append(l, arg);
-				state=WHITE;
+				laststate=SQUOTED;
+				state=ESCAPED;
 			}
 			else if(in[i]=='$')
-				state=VAR;
-			else if(in[i]=='\'')
-				state=SQUOTED;
-			else if(in[i]=='"')
-				state=DQUOTED;
-			else
 			{
-				arg[j]=in[i];
-				j++;
-			}
-			i++;
-			break;
-		case SQUOTED:
-			if(in[i]=='\\')
-			{
-				state=ESCAPED;
 				laststate=SQUOTED;
-			}
-			else if(in[i]=='\'')
-			{
-				if(in[i+1]!=' '&&in[i+1]!='\t'&&in[i+1]!='\0')
-				{
-					state=LITERAL;
-					goto ends;
-				}
-				arg[j]='\0';
-				list_append(l, arg);
-				state=WHITE;
+				state=VAR;
 			}
 			else
-			{
-				arg[j]=in[i];
-				j++;
-			}
-			ends:
+				arg[j++]=in[i];
 			i++;
 			break;
 		case DQUOTED:
-			if(in[i]=='\\')
+			if(in[i]=='"')
 			{
-				state=ESCAPED;
-				laststate=DQUOTED;
-			}
-			else if(in[i]=='"')
-			{
-				if(in[i+1]!=' '&&in[i+1]!='\t'&&in[i+1]!='\0')
+				if(in[i+1]=='\0')
 				{
-					state=LITERAL;
-					goto endd;
+					arg[j]='\0';
+					list_append(l, arg);
+					state=END;
 				}
-				arg[j]='\0';
-				list_append(l, arg);
-				state=WHITE;
+				else if(in[i+1]==' ')
+				{
+					arg[j]='\0';
+					list_append(l, arg);
+					state=WHITE;
+				}
+				else
+					state=LITERAL;
+				i++;
+				break;
+			}
+			else if(in[i]=='\\')
+			{
+				laststate=DQUOTED;
+				state=ESCAPED;
+			}
+			else if(in[i]=='$')
+			{
+				laststate=DQUOTED;
+				state=VAR;
 			}
 			else
-			{
-				arg[j]=in[i];
-				j++;
-			}
-			endd:
+				arg[j++]=in[i];
 			i++;
 			break;
-		case ESCAPED:
-			arg[j]=in[i];
-			i++;
-			j++;
-			if(in[i+1]=='\0')
+		case VAR:
+			for(nd=0; (in[i+nd]>='A'&&in[i+nd]<='Z')||(in[i+nd]>='0'&&in[i+nd]<='9')||in[i+nd]=='_'; nd++)
+				;
+			if(nd==0)
 			{
-				i++;
+				perror("no variable followed $, exiting");
+				exit(1);
+			}
+			for(ei=0; env[ei]!=NULL; ei++)
+				if(!strncmp(env[ei], in+i, nd)&&env[ei][nd]=='=')
+				{
+					if(j+strlen(env[ei]-nd-1)>cap)
+					{
+						arg=realloc(arg, 2*cap);
+						cap*=2;
+					}
+					strncpy(arg+j, env[ei]+nd+1, strlen(env[ei])-nd-1);
+					j+=strlen(env[ei])-nd-1;
+				}
+			i+=nd;
+			if(in[i]=='\0')
+			{
 				arg[j]='\0';
 				list_append(l, arg);
-				state=laststate;
-				break;
+			}
+			state=laststate;
+			break;
+		case ESCAPED:
+			arg[j++]=in[i];
+			i++;
+			if(in[i]=='\0')
+			{
+				arg[j]='\0';
+				list_append(l, arg);
 			}
 			state=laststate;
 			break;
 		case WHITE:
-			if(in[i]==' '||in[i]=='\t')
+			if(in[i]==' ')
 			{
 				i++;
 				break;
@@ -211,23 +227,18 @@ void parse2(list_t* l, char* in, char** env)
 				state=SQUOTED;
 				i++;
 			}
-			else if(in[i]=='$')
-			{
-				state=VAR;
-				i++;
-			}
 			else if(in[i]=='\\')
 			{
+				laststate=LITERAL;
 				state=ESCAPED;
 				i++;
 			}
 			else
 				state=LITERAL;
 			break;
-		case VAR:
-			break;
 		default:
 			break;
 		}
+
 	}
 }

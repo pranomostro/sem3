@@ -6,8 +6,6 @@
 
 #define IN_SZ 1024
 
-enum states { LITERAL, QUOTED, VAR, ESCAPED };
-
 const char* prompt="$ ";
 
 void parse(list_t*, char*, char**);
