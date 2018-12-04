@@ -1,0 +1,13 @@
+a)
+
+Funktionale Abhängigkeiten:
+{von, nach} → {von GPS, nach GPS}
+{*} → {Verbund}
+{Linie} → {#Fahrzeuge}
+{Linie} → {Modus}
+{Linie, von, nach} → {Preis}
+
+b)
+
+{Linie, von, nach}
+{Linie, von GPS, nach GPS}
