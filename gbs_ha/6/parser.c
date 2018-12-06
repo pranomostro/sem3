@@ -7,7 +7,6 @@
 const int MAX_ARG_SZ=1024;
 
 enum states { START, END, LITERAL, SQUOTED, DQUOTED, VAR, ESCAPED, WHITE };
-
 typedef int Parsestate;
 
 void parse(list_t* l, char* in, char** env)
@@ -18,24 +17,6 @@ void parse(list_t* l, char* in, char** env)
 
 	for(i=0; in[i]!='\0';)
 	{
-/*
-		printf("state: ");
-		switch(state)
-		{
-		case START: printf("START "); break;
-		case END: printf("END "); break;
-		case LITERAL: printf("LITERAL "); break;
-		case SQUOTED: printf("SQUOTED "); break;
-		case DQUOTED: printf("DQUOTED "); break;
-		case VAR: printf("VAR "); break;
-		case ESCAPED: printf("ESCAPED "); break;
-		case WHITE: printf("WHITE "); break;
-		default: break;
-		}
-
-		printf("\t laststate: %d\t arg: \"%s\"\t in: \"%s\" \ti: %ld\t j:%ld\n", laststate, arg, in+i, i, j);
-*/
-
 		switch(state)
 		{
 		case START:
@@ -208,6 +189,16 @@ void parse(list_t* l, char* in, char** env)
 				list_append(l, arg);
 			}
 			state=laststate;
+			if(in[i]=='"')
+			{
+				i++;
+				state=DQUOTED;
+			}
+			else if(in[i]=='\'')
+			{
+				i++;
+				state=SQUOTED;
+			}
 			break;
 		case WHITE:
 			if(in[i]==' ')

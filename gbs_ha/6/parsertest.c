@@ -30,7 +30,12 @@ int main(int argc, char** argv, char** envp)
 			in[strnlen(in, IN_SZ)-1]='\0';
 
 		parse(parsed, in, envp);
+
 		list_print(parsed, print_string);
+
+		if(!strncmp(parsed->first->data, "exit", strlen("exit")))
+			exit(0);
+
 		list_finit(parsed);
 
 		printf("%s", prompt);
