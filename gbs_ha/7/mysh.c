@@ -63,7 +63,7 @@ int main(int argc, char** argv, char** envp)
 		parse(parsed, in, envp);
 		split=list_to_array(parsed);
 
-		if(split==NULL)
+		if(split[0]==NULL)
 			goto noexec;
 
 		if(!strncmp(split[0], "exit", strlen("exit")))
@@ -79,10 +79,13 @@ int main(int argc, char** argv, char** envp)
 				else
 				{
 					strncpy(cmd, paths[s], IN_SZ);
-					strncpy(cmd+strlen(paths[s]), "/", 1);
+					strncpy(cmd+strlen(paths[s]), "/", 2);
 					strncpy(cmd+strlen(paths[s])+1, split[0], strlen(split[0]));
 					strncpy(cmd+strlen(paths[s])+1+strlen(split[0]), "\0", 1);
 				}
+				/*
+					If split ends with "> f1" or "< f2" or "< f1 > f2" or "> f2 < f1"
+				*/
 				execve(cmd, split, envp);
 			}
 			perror("command not found");
@@ -99,8 +102,6 @@ int main(int argc, char** argv, char** envp)
 			break;
 		}
 
-		free(split);
-
 		p=wait(NULL);
 		retproc.p=p;
 		le=list_find(prcs, (char*) &retproc, cmppid);
@@ -109,6 +110,7 @@ int main(int argc, char** argv, char** envp)
 
 	noexec:
 
+		free(split);
 		list_finit(parsed);
 
 		printf("%s", prompt);
