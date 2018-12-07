@@ -16,21 +16,22 @@ type expr = Const of rat
 type value = Rat of rat | Fun of var * state * expr (* new *)
 and state = var -> value option (* new *)
 
-
 (* 7.6 type definitions *)
 type graph = (int * float * int) list
-
 
 (*****************************************************************************)
 (**************************** HOMEWORK STARTS HERE ***************************)
 (*****************************************************************************)
 (* Assignment 7.4 [7 points] *)
-let f1 = todo
-let f2 = todo
-let f3 = todo
+
+let rec pow x n = if n<=0 then 1 else x*pow x (n-1)
+
+let f1 x y = x+1
+let f2 x y = if List.length x > List.length y then x else y
+let f3 x y = let (a, b)=y in x@[(b, a)]
 let f4 = todo
-let f5 = todo
-let f6 = todo
+let f5 f p = let (ks, v)=p in fun k -> if ks=k then v else f k
+let f6 v f=let x::xs=v in f(x)::v
 let f7 = todo
 
 (*****************************************************************************)
