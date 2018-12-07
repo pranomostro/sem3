@@ -37,22 +37,33 @@ let f7 = todo
 (*****************************************************************************)
 (* Assignment 7.5 [7 points] *)
 let rec eval_expr (s : state) (e : expr) : value =
-  match e with Const c -> Rat c
-  | UnOp (Neg, e) -> (match eval_expr s e with
-    | Rat (n, d) -> Rat (-n, d)
-    | _ -> failwith "invalid type")
-  | BinOp (op, e1, e2) ->
-    (match eval_expr s e1, eval_expr s e2 with
-    | Rat (n1, d1), Rat (n2, d2) ->
-      (match op with
-      | Add -> Rat (n1*d2+n2*d1,d1*d2)
-      | Sub -> Rat (n1*d2-n2*d1,d1*d2)
-      | Mul -> Rat (n1*n2,d1*d2)
-      | Div -> Rat (n1*d2,d1*n2))
-    | _ -> failwith "invalid type")
-  (* TODO: continue here *)
-    | _ -> todo ()
-
+	match e with Const c -> Rat c
+	| UnOp (Neg, e) -> (match eval_expr s e with
+		| Rat (n, d) -> Rat (-n, d)
+		| _ -> failwith "invalid type")
+	| BinOp (op, e1, e2) ->
+		(match eval_expr s e1, eval_expr s e2 with
+		| Rat (n1, d1), Rat (n2, d2) ->
+			(match op with
+			| Add -> Rat (n1*d2+n2*d1,d1*d2)
+			| Sub -> Rat (n1*d2-n2*d1,d1*d2)
+			| Mul -> Rat (n1*n2,d1*d2)
+			| Div -> Rat (n1*d2,d1*n2))
+		| _ -> failwith "invalid type")
+	| Var v -> (match (s v) with
+		| Some v -> v
+		| None -> failwith "unbound variable")
+	| Ite (c, t, e) -> (match eval_expr s c with
+		| Rat (n, d) -> if n<>0 then eval_expr s t else eval_expr s e
+		| Fun _ -> failwith "expected rat in condition")
+	| Bind (x, e, b) -> let _=print_string ("binding "^x^"\n") in
+		let vox=eval_expr s e in
+		let t f=if f=x then Some vox else s f in
+		eval_expr t b
+	| Func (a, b) -> Fun (a, s, b)
+	| App (f, a) ->  match eval_expr s f with
+		| Fun (arg, stt, expr) -> eval_expr stt (Bind(arg, a, expr))
+		| Rat _ -> failwith "invalid type"
 
 (*****************************************************************************)
 (* assignment 7.6 [6 points] *)
@@ -101,6 +112,9 @@ let a75_ex6 = Bind ("f", Func ("x", BinOp (Mul, Var "x", Var "x")), App (Var "f"
   add x 4/3
 *)
 let a75_ex7 = Bind ("add", Func ("x", Func ("y", BinOp (Add, Var "x", Var "y"))), Bind ("x", Const (2,3), App (App (Var "add", Var "x"), Const (4, 3))))
+(*let a75_ex7 = Bind("add1", Func ("x", BinOp(Add, Const(2, 2), Var "x")), App (Var "add1", Const (2, 2)))*)
+(*let a75_ex7=Bind("add", Func ("x", Func ("y", BinOp (Add, Var "x", Var "y"))), App (App (Var "add", Const (1, 1)), Const (1, 1)))*)
+(*let a75_ex7=Bind("one", Const(1, 1), Bind("two", Const(1, 1), BinOp(Add, Var "one", Var "two")))*)
 
 (*
   (let x = 2/1 in fun a -> let x = a + x in x * x) 10/2
