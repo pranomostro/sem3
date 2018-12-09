@@ -36,8 +36,8 @@ let f7 = todo
 
 (*****************************************************************************)
 (* Assignment 7.5 [7 points] *)
-let rec eval_expr (s : state) (e : expr) : value =
-	match e with Const c -> Rat c
+
+let rec eval_expr (s : state) (e : expr) : value = match e with Const c -> Rat c
 	| UnOp (Neg, e) -> (match eval_expr s e with
 		| Rat (n, d) -> Rat (-n, d)
 		| _ -> failwith "invalid type")
@@ -50,25 +50,42 @@ let rec eval_expr (s : state) (e : expr) : value =
 			| Mul -> Rat (n1*n2,d1*d2)
 			| Div -> Rat (n1*d2,d1*n2))
 		| _ -> failwith "invalid type")
-	| Var v -> (match (s v) with
-		| Some v -> v
+	| Var v ->  (match (s v) with
+		| Some t -> t
 		| None -> failwith "unbound variable")
 	| Ite (c, t, e) -> (match eval_expr s c with
 		| Rat (n, d) -> if n<>0 then eval_expr s t else eval_expr s e
 		| Fun _ -> failwith "expected rat in condition")
-	| Bind (x, e, b) -> let _=print_string ("binding "^x^"\n") in
-		let vox=eval_expr s e in
+	| Bind (x, e, b) -> let vox=eval_expr s e in
 		let t f=if f=x then Some vox else s f in
 		eval_expr t b
 	| Func (a, b) -> Fun (a, s, b)
-	| App (f, a) ->  match eval_expr s f with
-		| Fun (arg, stt, expr) -> eval_expr stt (Bind(arg, a, expr))
+	| App (f, a) ->	match eval_expr s f with
+		| Fun (arg, stt, expr) -> eval_expr s (Bind(arg, a, expr))
 		| Rat _ -> failwith "invalid type"
 
 (*****************************************************************************)
 (* assignment 7.6 [6 points] *)
-let mst = todo
 
+let sgbw g =
+	List.sort (fun x y -> let (_,w1,_)=x and (_,w2,_)=y in  if w1<w2 then -1 else if w1>w2 then 1 else 0) g
+
+let conn_to_tree t e = List.fold_left (||) false (List.map (fun x -> let (e1, _, _)=e and (_, _, x1)=x in e1=x1) t)
+
+let rem_from_list e l = List.filter (fun x -> x<>e) l
+let rem_from_graph r g = List.filter (fun x -> let (s, w, d)=x in d<>r) g
+
+let rec prim_mst t g u = match u with
+	| [] -> t
+	| _ -> (match t with
+		| [] -> (match g with
+			| [] -> t
+			| (s,w,d)::e -> let uu=rem_from_list d u in prim_mst [(s,w,d)] (rem_from_graph s e) uu)
+		| _ -> (match List.filter (conn_to_tree t) g with
+			| [] -> t
+			| (s,w,d)::cs -> let uu=rem_from_list d u in prim_mst ((s,w,d)::t) (rem_from_graph d g) uu))
+
+let mst g=let sg=sgbw g in prim_mst [] sg (List.map (fun x -> let (s,w,d)=x in d) sg)
 
 (*****************************************************************************)
 (***************************** HOMEWORK ENDS HERE ****************************)
@@ -112,15 +129,11 @@ let a75_ex6 = Bind ("f", Func ("x", BinOp (Mul, Var "x", Var "x")), App (Var "f"
   add x 4/3
 *)
 let a75_ex7 = Bind ("add", Func ("x", Func ("y", BinOp (Add, Var "x", Var "y"))), Bind ("x", Const (2,3), App (App (Var "add", Var "x"), Const (4, 3))))
-(*let a75_ex7 = Bind("add1", Func ("x", BinOp(Add, Const(2, 2), Var "x")), App (Var "add1", Const (2, 2)))*)
-(*let a75_ex7=Bind("add", Func ("x", Func ("y", BinOp (Add, Var "x", Var "y"))), App (App (Var "add", Const (1, 1)), Const (1, 1)))*)
-(*let a75_ex7=Bind("one", Const(1, 1), Bind("two", Const(1, 1), BinOp(Add, Var "one", Var "two")))*)
 
 (*
   (let x = 2/1 in fun a -> let x = a + x in x * x) 10/2
 *)
 let a75_ex8 = App (Bind ("x", Const (2,1), Func ("a", Bind ("x", BinOp (Add, Var "a", Var "x"), BinOp (Mul, Var "x", Var "x")))), Const (10, 2))
-
 
 let a76_ex1 = [0,1.,1; 0,4.,2; 1,2.,2; 1,1.,3; 2,3.,3]
 let a76_ex2 = [0,4.,1; 0,4.,7; 1,8.,2; 1,11.,7; 2,7.,3; 2,4.,5; 2,2.,8; 3,9.,4; 3,14.,5; 4,10.,5; 5,2.,6; 6,1.,7; 6,6.,8; 7,7.,8;]
