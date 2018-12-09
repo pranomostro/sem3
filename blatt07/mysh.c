@@ -5,11 +5,14 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <pthread.h>
 #include <unistd.h>
 
 #include "list.h"
 
 #define IN_SZ 1024
+
+pthread_mutex_t fl=PTHREAD_MUTEX_INITIALIZER;
 
 const char* exit_cmd="exit";
 const char* prompt="$ ";
@@ -100,8 +103,10 @@ void redirect(char** split, int pfd, int tr)
 	}
 	if(pfd>=0)
 	{
+		pthread_mutex_lock(&fl);
 		close(tr);
 		dup(pfd);
+		pthread_mutex_unlock(&fl);
 	}
 }
 
