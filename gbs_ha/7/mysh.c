@@ -5,11 +5,14 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <pthread.h>
 #include <unistd.h>
 
 #include "list.h"
 
 #define IN_SZ 1024
+
+pthread_mutex_t fl=PTHREAD_MUTEX_INITIALIZER;
 
 const char* exit_cmd="exit";
 const char* prompt="$ ";
@@ -19,6 +22,7 @@ const char* updir="../";
 const char* rootdir="/";
 const char* into=">";
 const char* outof="<";
+const char* piped="|";
 
 typedef struct prc {
 	int p;
@@ -37,7 +41,7 @@ void print_string(char* s)
 	puts(s);
 }
 
-void redirect(char** split)
+void redirect(char** split, int pfd, int tr)
 {
 	int nsi, nso;
 	size_t t;
@@ -97,13 +101,22 @@ void redirect(char** split)
 		}
 		split[t-2]=NULL;
 	}
+	if(pfd>=0)
+	{
+		pthread_mutex_lock(&fl);
+		close(tr);
+		dup(pfd);
+		pthread_mutex_unlock(&fl);
+	}
 }
 
 int main(int argc, char** argv, char** envp)
 {
-	size_t s, t;
+	size_t s, t, npipes;
 	char* tknd, * in, * cmd;
 	char** split, ** paths;
+	char*** pipesplit;
+	int ppfd[2];
 	pid_t p;
 	struct list_elem* le;
 	process retproc, * child;
@@ -147,51 +160,111 @@ int main(int argc, char** argv, char** envp)
 		if(!strncmp(split[0], exit_cmd, strlen(exit_cmd)))
 			exit(0);
 
-		switch((p=fork()))
-		{
-		case 0:
-			for(s=0; paths[s]!=NULL; s++)
+		for(s=0, npipes=1; split[s]!=NULL; s++)
+			if(!strncmp(split[s], piped, strlen(piped)))
+				npipes++;
+
+		pipesplit=(char***)malloc(sizeof(char**)*(npipes+1));
+
+		t=0;
+		pipesplit[t++]=split;
+
+		for(s=0; split[s]!=NULL&&t<=npipes; s++)
+			if(!strncmp(split[s], piped, strlen(piped)))
 			{
-				if(!strncmp(split[0], thisdir, strlen(thisdir))||!strncmp(split[0], updir, strlen(updir)))
-					strncpy(cmd, split[0], strlen(split[0])+1);
-				else
-				{
-					strncpy(cmd, paths[s], IN_SZ);
-					strncpy(cmd+strlen(paths[s]), rootdir, strlen(rootdir));
-					strncpy(cmd+strlen(paths[s])+1, split[0], strlen(split[0]));
-					strncpy(cmd+strlen(paths[s])+1+strlen(split[0]), "\0", 1);
-				}
-				redirect(split);
-				execve(cmd, split, envp);
+				pipesplit[t]=split+s+1;
+				split[s]=NULL;
+				t++;
 			}
-			perror("command not found");
-			exit(1);
-			break;
-		case -1:
-			perror("could not fork, exiting");
-			exit(1);
-			break;
-		default:
-			child=(process*)malloc(sizeof(process));
-			child->p=p;
-			list_append(prcs, (char*) child);
-			break;
+
+		pipesplit[t]=NULL;
+
+		if(npipes==2)
+		{
+			if(pipe(ppfd)<0)
+			{
+				perror("could not create pipe");
+				goto noexec;
+			}
+		}
+		else if(npipes>2)
+		{
+			perror("patience, grapsshopper, more than one pipe will be implemented");
+			goto noexec;
 		}
 
-		p=wait(NULL);
-		retproc.p=p;
-		le=list_find(prcs, (char*) &retproc, cmppid);
-		free(le->data);
-		list_remove(prcs, le);
+		for(t=0;t<npipes;t++)
+			switch((p=fork()))
+			{
+			case 0:
+				for(s=0; paths[s]!=NULL; s++)
+				{
+					if(!strncmp(pipesplit[t][0], thisdir, strlen(thisdir))||!strncmp(pipesplit[t][0], updir, strlen(updir)))
+						strncpy(cmd, pipesplit[t][0], strlen(pipesplit[t][0])+1);
+					else
+					{
+						strncpy(cmd, paths[s], IN_SZ);
+						strncpy(cmd+strlen(paths[s]), rootdir, strlen(rootdir));
+						strncpy(cmd+strlen(paths[s])+1, pipesplit[t][0], strlen(pipesplit[t][0]));
+						strncpy(cmd+strlen(paths[s])+1+strlen(pipesplit[t][0]), "\0", 1);
+					}
+					if(npipes==2&&t==0)
+					{
+						redirect(pipesplit[t], ppfd[1], 1);
+						close(ppfd[0]);
+						close(ppfd[1]);
+						execve(cmd, pipesplit[t], envp);
+					}
+					else if(npipes==2&&t==1)
+					{
+						redirect(pipesplit[t], ppfd[0], 0);
+						close(ppfd[0]);
+						close(ppfd[1]);
+						execve(cmd, pipesplit[t], envp);
+					}
+					else
+					{
+						redirect(pipesplit[t], -1, -1);
+						execve(cmd, pipesplit[t], envp);
+					}
+				}
+				perror("command not found");
+				exit(1);
+				break;
+			case -1:
+				perror("could not fork, exiting");
+				exit(1);
+				break;
+			default:
+				child=(process*)malloc(sizeof(process));
+				child->p=p;
+				list_append(prcs, (char*) child);
+				break;
+		}
+
+		if(npipes==2)
+		{
+			close(ppfd[0]);
+			close(ppfd[1]);
+		}
+
+		while(prcs->size>0)
+		{
+			p=wait(NULL);
+			retproc.p=p;
+			le=list_find(prcs, (char*) &retproc, cmppid);
+			free(le->data);
+			list_remove(prcs, le);
+		}
 
 	noexec:
-
 		free(split);
 		list_finit(parsed);
 
 		printf("%s", prompt);
 		fflush(stdout);
 		fgets(in, IN_SZ, stdin);
+		free(pipesplit);
 	}
 
 	free(in);
