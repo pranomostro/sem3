@@ -1,0 +1,80 @@
+a)
+
+A → BC
+C → DA
+E → ABC
+F → CD
+CD → BEF
+
+AttrHülle(R, A)
+	Erg=A
+
+	Erg=Erg ∪ BC
+	Erg=Erg ∪ DA
+	Erg=Erg ∪ BEF
+
+Erg==ABCDEF
+
+b)
+
+A → B
+A → C
+C → A
+C → D
+E → A
+E → B
+E → C
+F → C
+F → D
+CD → B
+CD → E
+CD → F
+
+A → D
+C → B
+E → D
+F → A
+F → B
+
+A → E
+A → F
+
+C → CD → E
+C → CD → F
+
+E → C → F
+F → C → E
+
+A → BCDEF
+C → ABDEF
+E → ABCDF
+F → ABCDE
+
+Kandidatenschlüssel:
+
+A → BCDEF
+C → ABDEF
+E → ABCDF
+F → ABCDE
+
+c)
+
+R={A,B,C,D,E,F}
+
+Linksreduktion (für A, C, E, F):
+AttrHülle(R, ∅)=∅
+
+Für diese ist die Linksreduktion nicht sinnvoll.
+
+AttrHülle(R, C)=ABDEF ⊂ BEF
+AttrHülle(R, D)=∅ ~⊂ BEF
+
+D kann aus CD → BEF weggelassen werden.
+
+Linksreduktion Ergebnis:
+
+A → BC
+C → DA
+E → ABC
+F → CD
+C → BEF
