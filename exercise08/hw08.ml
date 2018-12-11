@@ -8,11 +8,26 @@ type 'a ltree = LNode of 'a * (unit -> 'a ltree) * (unit -> 'a ltree)
 (**************************** HOMEWORK STARTS HERE ***************************)
 (*****************************************************************************)
 (* Assignment 8.5 [3 Points] *)
-let interleave3 = todo
+
+let rec interleave3_tr a l1 l2 l3=match l1, l2, l3 with
+	| [], [], [] -> a
+	| [], _, _ -> interleave3_tr a l2 l3 l1
+	| x::xs, _, _ -> let ap=x::a in interleave3_tr ap l2 l3 xs
+
+let interleave3 l1 l2 l3=List.rev (interleave3_tr [] l1 l2 l3)
 
 (*****************************************************************************)
 (* Assignment 8.6 [4 Points] *)
-let lagrange = todo
+
+let rec lj x xj j p k = match p with
+	| [] -> 1.0
+	| (xk, _)::pr -> if j=k then lj x xj j pr (k+.1.0) else (x-.xk)/.(xj-.xk)*.(lj x xj j pr (k+.1.0))
+
+let rec lag p pr n x = match pr with
+	| [] -> 0.0
+	| (xn,yn)::prr -> (yn*.(lj x xn n p 0.0))+.(lag p prr (n+.1.0) x)
+
+let lagrange p = fun x -> lag p p 0.0 x
 
 (*****************************************************************************)
 (* Assignment 8.7 [6 Points] *)
