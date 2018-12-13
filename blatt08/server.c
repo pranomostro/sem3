@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <arpa/inet.h>
 #include <sys/time.h>
+#include <sys/poll.h>
 
 #include "list.h"
 
@@ -18,6 +19,28 @@ struct connection {
     struct sockaddr_in sin;
     struct timeval timeout;
 };
+
+void addSd (int sd, struct pollfd* sds, int len) {
+    for (int i = 0; i < len; i++) {
+        if (sds[i].fd == -1) {
+            sds[i].fd = sd;
+            return;
+        } 
+    }
+
+    puts("Can't add new sd");
+}
+
+void removeSd (int sd, struct pollfd* sds, int len) {
+    for (int i = 0; i < len; i++) {
+        if (sds[i].fd == sd) {
+            sds[i].fd = -1;
+            return;
+        } 
+    }
+
+    puts("Can't find sd");
+}
 
 int main (int argc, char** argv) {
     int echoSock;
@@ -53,26 +76,69 @@ int main (int argc, char** argv) {
 
     puts("Listening...");
 
-    struct sockaddr_in clientAddr;
-    unsigned int clientLen;
-    int clientSd;
-
-    if ((clientSd = accept(echoSock, (struct sockaddr *) &clientAddr, &clientLen)) < 0) {
-        perror("Accept failed");
-        close(echoSock);
-        exit(-1);
+    struct pollfd sds[MAX_CONN + 1];
+    // Init pollfds
+    for (int i; i < MAX_CONN + 1; i++) {
+        sds[i].fd = -1;
+        sds[i].events = POLLIN;
     }
+    sds[0].fd = echoSock;
+    //printf("%d\n", echoSock);
 
-    puts("Accepted");
+    while (1) {
+        int pollRet = poll(sds, MAX_CONN + 1, 10000);
+        printf("%d\n", pollRet);
+        if (pollRet < 0) {
+            perror("Poll failed");
+            close(echoSock);
+            exit(-1);
+        } else if (pollRet == 0) {
+            puts("Timeout");
+            close(echoSock);
+            exit(-1);
+        }
 
-    int end = recv(clientSd, buffer, sizeof(buffer) - 1, 0);
-    buffer[end] = '\0';
+        for (int i = 0; i < MAX_CONN + 1; i++) {
+            if (sds[i].revents == 0) {
+                continue;
+            }
 
-    printf("%s\n", buffer);
+            printf("%d\n", sds[i].fd);
 
-    send(clientSd, buffer, end + 1, 0);
+            if (sds[i].revents & POLLHUP) {
+                close(sds[i].fd);
+                printf("Closed %d\n", sds[i].fd);
+                sds[i].fd = -1;
+            } else if (sds[i].revents & POLLIN) {
+                if (sds[i].fd == echoSock) {
+                    // Accept
+                    struct sockaddr_in clientAddr;
+                    unsigned int clientLen;
+                    int clientSd;
 
-    close(clientSd);
+                    if ((clientSd = accept(echoSock, (struct sockaddr *) &clientAddr, &clientLen)) < 0) {
+                        perror("Accept failed");
+                        close(echoSock);
+                        exit(-1);
+                    }
+
+                    puts("Accepted");
+
+                    printf("%d\n", clientSd);
+
+                    addSd(clientSd, sds, MAX_CONN + 1);
+                } else {
+                    // Echo
+                    int end = recv(sds[i].fd, buffer, sizeof(buffer) - 1, 0);
+                    // buffer[end] = '\0';
+
+                    // printf("%s\n", buffer);
+
+                    send(sds[i].fd, buffer, end, 0);
+                }
+            }
+        }
+    }
 
     close(echoSock);
     return 0;
