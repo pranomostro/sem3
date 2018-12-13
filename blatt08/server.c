@@ -25,6 +25,31 @@ struct connection {
     enum service service;
 };
 
+int nextTimeout (list_t* conns, int serverTimeout) {
+    int minTimeout = serverTimeout;
+    struct list_elem* le = conns->first;
+    while (le != NULL) {
+        struct connection* c = (struct connection*) le->data;
+        if (c->timeout < minTimeout) {
+            minTimeout = c->timeout;
+        }
+        le = le->next;
+    }
+
+    return minTimeout;
+}
+
+void updateTimeouts (list_t* conns, int elapsed, int triggeredBy) {
+    struct list_elem* le = conns->first;
+    while (le != NULL) {
+        struct connection* c = (struct connection*) le->data;
+        if (c->sd != triggeredBy) {
+            c->timeout -= elapsed;
+        }
+        le = le->next;
+    }
+}
+
 int cmpSd (const char* d1, const char* d2) {
     struct connection* c1 = (struct connection *) d1;
     struct connection* c2 = (struct connection *) d2;
