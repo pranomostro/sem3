@@ -20,6 +20,12 @@ struct connection {
     struct timeval timeout;
 };
 
+void closeClient(struct pollfd* sds, int i, list_t* conns) {
+    close(sds[i].fd);
+    printf("Closed %d\n", sds[i].fd);
+    sds[i].fd = -1;
+}
+
 void addSd (int sd, struct pollfd* sds, int len) {
     for (int i = 0; i < len; i++) {
         if (sds[i].fd == -1) {
@@ -99,16 +105,15 @@ int main (int argc, char** argv) {
         }
 
         for (int i = 0; i < MAX_CONN + 1; i++) {
-            if (sds[i].revents == 0) {
+            if (sds[i].fd < 0 || sds[i].revents == 0) {
                 continue;
             }
 
-            printf("%d\n", sds[i].fd);
+            printf("FD:%d I:%d rev:%x hup:%x\n", sds[i].fd, i, sds[i].revents, POLLHUP);
+            
 
             if (sds[i].revents & POLLHUP) {
-                close(sds[i].fd);
-                printf("Closed %d\n", sds[i].fd);
-                sds[i].fd = -1;
+                closeClient(sds, i, NULL);
             } else if (sds[i].revents & POLLIN) {
                 if (sds[i].fd == echoSock) {
                     // Accept
@@ -128,11 +133,12 @@ int main (int argc, char** argv) {
 
                     addSd(clientSd, sds, MAX_CONN + 1);
                 } else {
+                    puts("echo");
                     // Echo
                     int end = recv(sds[i].fd, buffer, sizeof(buffer) - 1, 0);
-                    // buffer[end] = '\0';
-
-                    // printf("%s\n", buffer);
+                    if (end == 0) {
+                        closeClient(sds, i, NULL);
+                    }
 
                     send(sds[i].fd, buffer, end, 0);
                 }
