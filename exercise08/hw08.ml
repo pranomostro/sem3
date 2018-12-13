@@ -31,26 +31,49 @@ let lagrange p = fun x -> lag p p 0.0 x
 
 (*****************************************************************************)
 (* Assignment 8.7 [6 Points] *)
-let insert = todo
+let rec insert v compare t = match t with
+	| Empty -> Node (v, Empty, Empty)
+	| Node (nv, l, r) -> if (compare v nv)<0 then  Node(nv, (insert v compare l), r) else
+		if (compare v nv)>0 then Node(nv, l, (insert v compare r)) else
+		Node(nv, l, r)
 
-let string_of_tree = todo
+let rec string_of_tree f t = match t with
+	| Empty -> "Empty"
+	| Node (v, l, r) -> "Node ("^(f v)^", "^(string_of_tree f l)^", "^(string_of_tree f r)^")"
 
-let inorder_list = todo
+let rec inorder_list_tr t a rl = match t with
+	| Empty -> (match rl with
+		| [] -> a
+		| t::ts -> inorder_list_tr t a ts)
+	| Node (v, Empty, r) -> inorder_list_tr r (v::a) rl
+	| Node (v, l, r) -> inorder_list_tr l a ((Node (v, Empty, r))::rl)
+
+let inorder_list t = List.rev (inorder_list_tr t [] [])
 
 (*****************************************************************************)
 (* Assignment 8.8 [7 Points] *)
-let layer_tree = todo
+let rec layer_tree i = LNode (i, (fun () -> layer_tree (i+1)), (fun () -> layer_tree (i+1)))
 
-let interval_tree = todo
+let rec interval_tree t = let (l, h)=t in
+	LNode ((l, h), (fun () -> interval_tree (l, (l+.h)/.2.0)), (fun () -> interval_tree ((l+.h)/.2.0, h)))
 
-let rational_tree = todo
+let rec rational_tree () = let rec rat_arg_tree f = let (n, d)=f in
+	LNode ((n, d), (fun () -> rat_arg_tree (n, d+1)), (fun () -> rat_arg_tree (n+1, d))) in
+	rat_arg_tree (0, 0)
 
-let top = todo
+let rec top n t=if n=0 then Empty else
+	match t with
+	| LNode (v, l, r) -> Node(v, top (n-1) (l ()), top (n-1) (r ()))
 
-let map = todo
+let rec map f t = match t with
+	| LNode (v, l, r) -> LNode ((f v), (fun () -> map f (l ())), (fun () -> map f (r ())))
 
-let find = todo
-
+let find p t = let rec impl tl =
+		let pff=List.filter (fun x -> let LNode (v, _, _)=x in p v) tl in
+			match pff with
+			| [] -> impl (List.flatten (List.map (fun x -> let LNode (v, f1, f2)=x in [f1();f2()]) tl))
+			| x::xs -> x
+	in impl [t]
 
 (*****************************************************************************)
 (**************************** END OF HOMEWORK ********************************)
@@ -72,7 +95,6 @@ let a88_ex2 = let rec b s () = LNode (s, b (0::s), b (1::s)) in b [] ()
 let a88_ex3 = let rec b i () = LNode (i * i, b (i+1), b (i+1)) in b 0 ()
 let a88_ex4 = let rec b x () = LNode (x, b (x * 10), b (x + 10)) in b 0 ()
 let a88_ex5 = let rec b x () = LNode (x, b (x * 10), b (x + 10)) in b 1000 ()
-
 
 (*****************************************************************************)
 (* TESTS [do not change] *)
