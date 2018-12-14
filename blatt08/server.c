@@ -130,7 +130,7 @@ int main (int argc, char** argv) {
         exit(-1);
     }
 
-    puts("Created echo");
+    puts("[echo]: Created");
 
     // Fill eSin
     eSin.sin_family = AF_INET;
@@ -143,7 +143,7 @@ int main (int argc, char** argv) {
         exit(-1);
     }
 
-    puts("Bound");
+    puts("[echo]: Bound");
 
     if (listen(echoSock, MAX_CONN) != 0) {
         perror("Listen failed");
@@ -151,7 +151,7 @@ int main (int argc, char** argv) {
         exit(-1);
     }
 
-    puts("Listening...");
+    puts("[echo]: Listening...");
 
     struct pollfd sds[MAX_CONN + SERVICE_COUNT];
     // Init pollfds
@@ -225,7 +225,7 @@ int main (int argc, char** argv) {
                     list_append(conns, (char*) conn);
                 } else {
                     // Echo
-                    printf("Echo to %d\n", sds[i].fd);
+                    printf("[echo]: Communicating with %d\n", sds[i].fd);
                     int end = recv(sds[i].fd, buffer, sizeof(buffer) - 1, 0);
                     if (end == 0) {
                         puts("EOF");
