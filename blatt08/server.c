@@ -16,6 +16,7 @@
 #define SERVER_TIMEOUT 10000
 
 #define MAX_CONN 10
+#define SERVICE_COUNT 1
 
 enum service {echo, hexdump};
 
@@ -152,10 +153,10 @@ int main (int argc, char** argv) {
 
     puts("Listening...");
 
-    struct pollfd sds[MAX_CONN + 1];
+    struct pollfd sds[MAX_CONN + SERVICE_COUNT];
     // Init pollfds
     int i;
-    for (i = 0; i < MAX_CONN + 1; i++) {
+    for (i = 0; i < MAX_CONN + SERVICE_COUNT; i++) {
         sds[i].fd = -1;
         sds[i].events = POLLIN;
     }
@@ -165,7 +166,7 @@ int main (int argc, char** argv) {
     struct timeval endPoll;
     while (1) {
         gettimeofday(&startPoll, NULL);
-        int pollRet = poll(sds, MAX_CONN + 1, nextTimeout(conns, serverTimeout));
+        int pollRet = poll(sds, MAX_CONN + SERVICE_COUNT, nextTimeout(conns, serverTimeout));
         gettimeofday(&endPoll, NULL);
         int elapsed = (endPoll.tv_sec - startPoll.tv_sec) * 1000 + (endPoll.tv_usec - startPoll.tv_usec) / 1000;
         printf("Elapsed: %d\n", elapsed);
@@ -184,13 +185,13 @@ int main (int argc, char** argv) {
             break;
         }
 
-        for (i = 0; i < MAX_CONN + 1; i++) {
+        for (i = 0; i < MAX_CONN + SERVICE_COUNT; i++) {
             if (sds[i].fd < 0 || sds[i].revents == 0) {
                 continue;
             }
             
             if (sds[i].revents & POLLHUP) {
-                closeClient(sds[i].fd ,sds, MAX_CONN + 1, conns);
+                closeClient(sds[i].fd ,sds, MAX_CONN + SERVICE_COUNT, conns);
             } else if (sds[i].revents & POLLIN) {
                 if (sds[i].fd == echoSock) {
                     // Accept
@@ -208,7 +209,7 @@ int main (int argc, char** argv) {
 
                     printf("[echo]: Accepted %d\n", clientSd);
 
-                    addSd(clientSd, sds, MAX_CONN + 1);
+                    addSd(clientSd, sds, MAX_CONN + SERVICE_COUNT);
 
                     struct connection* conn = malloc(sizeof(struct connection));
                     if (conn == NULL) {
@@ -228,7 +229,7 @@ int main (int argc, char** argv) {
                     int end = recv(sds[i].fd, buffer, sizeof(buffer) - 1, 0);
                     if (end == 0) {
                         puts("EOF");
-                        closeClient(sds[i].fd, sds, MAX_CONN + 1, conns);
+                        closeClient(sds[i].fd, sds, MAX_CONN + SERVICE_COUNT, conns);
                         continue;
                     } else if (end < 0) {
                         puts ("end < 0");
@@ -261,7 +262,7 @@ int main (int argc, char** argv) {
             struct connection* c = (struct connection*) last->data;
             if (c->timeout <= 0) {
                 printf("Connection %d timeout\n", c->sd);
-                closeClient(c->sd, sds, MAX_CONN + 1, conns);
+                closeClient(c->sd, sds, MAX_CONN + SERVICE_COUNT, conns);
             }
         }
     }
