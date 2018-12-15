@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include <sys/poll.h>
+#include <string.h>
 
 #include "list.h"
 
@@ -123,7 +124,7 @@ int bind_socket (int sd, struct sockaddr_in eSin, int port) {
     eSin.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(sd, (struct sockaddr *) &eSin, sizeof(eSin)) != 0) {
-        perror("Binding failed\n");
+        perror("Binding failed");
         close(sd);
         exit(-1);
     }
@@ -161,7 +162,7 @@ int main (int argc, char** argv) {
     puts("[echo]: Created");
 
     if ((hdSock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("Socket creation failed\n");
+        perror("Socket creation failed");
         exit(-1);
     }
 
