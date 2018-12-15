@@ -17,7 +17,7 @@
 #define SERVER_TIMEOUT 10000
 
 #define MAX_CONN 10
-#define SERVICE_COUNT 1
+#define SERVICE_COUNT 2
 
 extern void hexdump(int sd, char* buffer, int length);
 
