@@ -18,7 +18,9 @@
 #define MAX_CONN 10
 #define SERVICE_COUNT 1
 
-enum service {echo, hexdump};
+extern void hexdump(int sd, char* buffer, int length);
+
+enum service {echo, hexdump_s};
 
 struct connection {
     int sd;
@@ -111,9 +113,35 @@ void closeClient(int sd, struct pollfd* sds, int len, list_t* conns) {
     list_remove(conns, le);
 }
 
+void closeAll(list_t* conns, int eSd, int hdSd) {
+
+}
+
+int bind_socket (int sd, struct sockaddr_in eSin, int port) {
+    eSin.sin_family = AF_INET;
+    eSin.sin_port = htons(port);
+    eSin.sin_addr.s_addr = INADDR_ANY;
+
+    if (bind(sd, (struct sockaddr *) &eSin, sizeof(eSin)) != 0) {
+        perror("Binding failed\n");
+        close(sd);
+        exit(-1);
+    }
+    return sd;
+}
+
+void listen_socket(int sd) {
+    if (listen(sd, MAX_CONN) != 0) {
+        perror("Listen failed");
+        close(sd);
+        exit(-1);
+    }
+}
+
 int main (int argc, char** argv) {
     int echoSock;
-    struct sockaddr_in  eSin;
+    int hdSock;
+    struct sockaddr_in  eSin, hdSin;
 
     int serverTimeout = SERVER_TIMEOUT;
 
@@ -132,26 +160,23 @@ int main (int argc, char** argv) {
 
     puts("[echo]: Created");
 
+    if ((hdSock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("Socket creation failed\n");
+        exit(-1);
+    }
+
+    puts("[hexdump]: Created");
+
     // Fill eSin
-    eSin.sin_family = AF_INET;
-    eSin.sin_port = htons(ECHO_PORT);
-    eSin.sin_addr.s_addr = INADDR_ANY;
-
-    if (bind(echoSock, (struct sockaddr *) &eSin, sizeof(eSin)) != 0) {
-        perror("Bind failed");
-        close(echoSock);
-        exit(-1);
-    }
-
+    bind_socket(echoSock, eSin, ECHO_PORT);
     puts("[echo]: Bound");
+    bind_socket(hdSock, hdSin, HD_PORT);
+    puts("[hexdump]: Bound");
 
-    if (listen(echoSock, MAX_CONN) != 0) {
-        perror("Listen failed");
-        close(echoSock);
-        exit(-1);
-    }
-
+    listen_socket(echoSock);
     puts("[echo]: Listening...");
+    listen_socket(hdSock);
+    puts("[hexdump]: Listening...");
 
     struct pollfd sds[MAX_CONN + SERVICE_COUNT];
     // Init pollfds
@@ -161,6 +186,7 @@ int main (int argc, char** argv) {
         sds[i].events = POLLIN;
     }
     sds[0].fd = echoSock;
+    sds[1].fd = hdSock;
 
     struct timeval startPoll;
     struct timeval endPoll;
@@ -223,6 +249,34 @@ int main (int argc, char** argv) {
                     serverTimeout = SERVER_TIMEOUT;
 
                     list_append(conns, (char*) conn);
+                } else if (sds[i].fd == hdSock) {
+                    struct sockaddr_in clientAddr;
+                    unsigned int clientLen = 0;
+                    int clientSd;
+
+                    if ((clientSd = accept(hdSock, (struct sockaddr *) &clientAddr, &clientLen)) < 0) {
+                        perror("Accept failed");
+                        close(hdSock);
+                        exit(-1);
+                    }
+
+                    printf("[hexdump]: Accepted %d\n", clientSd);
+
+                    addSd(clientSd, sds, MAX_CONN + SERVICE_COUNT);
+
+                    struct connection* conn = malloc(sizeof(struct connection));
+
+                    if (conn == NULL) {
+                        perror("Can't allocate new connection");
+                        exit(-1);
+                    }
+                    conn->sd = clientSd;
+                    conn->service = hexdump_s;
+                    conn->timeout = CONN_TIMEOUT;
+
+                    serverTimeout = SERVER_TIMEOUT;
+
+                    list_append(conns, (char*) conn);
                 } else {
                     // Echo
                     printf("[echo]: Communicating with %d\n", sds[i].fd);
@@ -247,8 +301,20 @@ int main (int argc, char** argv) {
                     struct connection* c = (struct connection*) le->data;
                     c->timeout = CONN_TIMEOUT;
                     serverTimeout = SERVER_TIMEOUT;
-
-                    send(sds[i].fd, buffer, end, 0);
+                    
+                    switch (c->service)
+                    {
+                        case echo:
+                            write(sds[i].fd, buffer, end);
+                            break;
+                        case hexdump_s:
+                            hexdump(sds[i].fd, buffer, end);
+                            break;
+                        default:
+                            perror("Unknown type\n");
+                            exit(-1);
+                            break;
+                    }
                 }
             }
         }
@@ -270,5 +336,6 @@ int main (int argc, char** argv) {
     list_finit(conns);
     free(conns);
     close(echoSock);
+    close(hdSock);
     return 0;
 }
