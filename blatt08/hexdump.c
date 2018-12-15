@@ -24,7 +24,7 @@ void hexdump(int sd, char* buffer, int length)
 			sprintf(&buf[index], "   ");
 			index += 3;
 		}
-		sprintf(&buf[index], "   ");
+		sprintf(&buf[index], "  ");
 		index += 3;
 		printf("Added third line: %s\nLength: %d\n", buf, index);
 		for(o=0; o<16 && !(i + o >= length && (i>0 || o>0)); o++) {
@@ -36,7 +36,7 @@ void hexdump(int sd, char* buffer, int length)
 	}
 	
 	// Sending the hexdump back to the Client
-
+	
 	if (write(sd, buf, index) < 0) {
 		perror("Error while sending Hexdump\n");
 		close(sd);
