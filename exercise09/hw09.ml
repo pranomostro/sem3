@@ -89,32 +89,32 @@ let check_run_santas_factory () =
     | _ -> raise' (Failure "wrong list passed to selection_alg")
   in
   ignore(run_santas_factory 13 test_selection_alg);
-  if not (check_letter "marta_letter.txt") then raise (Failure "no correct letter produced for marta");
-  if not (check_letter "bruno_letter.txt") then raise (Failure "no correct letter produced for bruno");
-  if not (check_file "frida_presents.txt" ["colorful pencils";"ocaml book"]) then raise (Failure "no correct present list produced for frida");
-  if not (check_file "tommy_presents.txt" ["sand toys";"superman action doll set"]) then raise (Failure "no correct present list produced for tommy");
-  if not (check_file "caren_presents.txt" ["penguin doll";"unicorn"]) then raise (Failure "no correct present list produced for caren");
+  if not (check_letter "exercise09/marta_letter.txt") then raise (Failure "no correct letter produced for marta");
+  if not (check_letter "exercise09/bruno_letter.txt") then raise (Failure "no correct letter produced for bruno");
+  if not (check_file "exercise09/frida_presents.txt" ["colorful pencils";"ocaml book"]) then raise (Failure "no correct present list produced for frida");
+  if not (check_file "exercise09/tommy_presents.txt" ["sand toys";"superman action doll set"]) then raise (Failure "no correct present list produced for tommy");
+  if not (check_file "exercise09/caren_presents.txt" ["penguin doll";"unicorn"]) then raise (Failure "no correct present list produced for caren");
   true
 
 let tests = [
   (* tests for 9.3 - 1 *)
-  __LINE_OF__ (fun () -> (read_notes "examples/santas_notes.txt") =| ["tommy",Nice;"bruno",Naughty;"frida",Nice;"caren",Nice;"marta",Naughty]);
-  __LINE_OF__ (fun () -> let fn = "examples/santas_notes_broken1.txt" in check_throws (Invalid_file_format fn) (fun () -> read_notes fn));
-  __LINE_OF__ (fun () -> let fn = "examples/santas_notes_broken2.txt" in check_throws (Invalid_file_format fn) (fun () -> read_notes fn));
+  __LINE_OF__ (fun () -> (read_notes "exercise09/examples/santas_notes.txt") =| ["tommy",Nice;"bruno",Naughty;"frida",Nice;"caren",Nice;"marta",Naughty]);
+  __LINE_OF__ (fun () -> let fn = "exercise09/examples/santas_notes_broken1.txt" in check_throws (Invalid_file_format fn) (fun () -> read_notes fn));
+  __LINE_OF__ (fun () -> let fn = "exercise09/examples/santas_notes_broken2.txt" in check_throws (Invalid_file_format fn) (fun () -> read_notes fn));
   (* tests for 9.3 - 2 *)
-  __LINE_OF__ (fun () -> (read_wishlist "examples/frida_wishlist.txt") =| ["ocaml book",10;"horse",3;"colorful pencils",12]);
-  __LINE_OF__ (fun () -> let fn = "examples/wishlist_broken1.txt" in check_throws (Invalid_file_format fn) (fun () -> read_wishlist fn));
-  __LINE_OF__ (fun () -> let fn = "examples/wishlist_broken2.txt" in check_throws (Invalid_file_format fn) (fun () -> read_wishlist fn));
-  __LINE_OF__ (fun () -> let fn = "examples/wishlist_broken3.txt" in check_throws (Invalid_file_format fn) (fun () -> read_wishlist fn));
+  __LINE_OF__ (fun () -> (read_wishlist "exercise09/examples/frida_wishlist.txt") =| ["ocaml book",10;"horse",3;"colorful pencils",12]);
+  __LINE_OF__ (fun () -> let fn = "exercise09/examples/wishlist_broken1.txt" in check_throws (Invalid_file_format fn) (fun () -> read_wishlist fn));
+  __LINE_OF__ (fun () -> let fn = "exercise09/examples/wishlist_broken2.txt" in check_throws (Invalid_file_format fn) (fun () -> read_wishlist fn));
+  __LINE_OF__ (fun () -> let fn = "exercise09/examples/wishlist_broken3.txt" in check_throws (Invalid_file_format fn) (fun () -> read_wishlist fn));
   (* tests for 9.3 - 3 *)
-  __LINE_OF__ (fun () -> (load_catalogue "examples/toys_catalogue.txt") =| a933_ex1);
-  __LINE_OF__ (fun () -> let fn = "examples/toys_catalogue_broken1.txt" in check_throws (Invalid_file_format fn) (fun () -> load_catalogue fn));
-  __LINE_OF__ (fun () -> let fn = "examples/toys_catalogue_broken2.txt" in check_throws (Invalid_file_format fn) (fun () -> load_catalogue fn));
-  __LINE_OF__ (fun () -> let fn = "examples/toys_catalogue_broken3.txt" in check_throws (Invalid_file_format fn) (fun () -> load_catalogue fn));
+  __LINE_OF__ (fun () -> (load_catalogue "exercise09/examples/toys_catalogue.txt") =| a933_ex1);
+  __LINE_OF__ (fun () -> let fn = "exercise09/examples/toys_catalogue_broken1.txt" in check_throws (Invalid_file_format fn) (fun () -> load_catalogue fn));
+  __LINE_OF__ (fun () -> let fn = "exercise09/examples/toys_catalogue_broken2.txt" in check_throws (Invalid_file_format fn) (fun () -> load_catalogue fn));
+  __LINE_OF__ (fun () -> let fn = "exercise09/examples/toys_catalogue_broken3.txt" in check_throws (Invalid_file_format fn) (fun () -> load_catalogue fn));
   (* tests for 9.3 - 4 *)
-  __LINE_OF__ (fun () -> let l = ["socks";"colorful pencils";"horse"] in let fn = "examples/testout_list1.txt" in write_list fn l; check_file fn l);
+  __LINE_OF__ (fun () -> let l = ["exercise09/socks";"colorful pencils";"horse"] in let fn = "examples/testout_list1.txt" in write_list fn l; check_file fn l);
   (* tests for 9.3 - 5 *)
-  __LINE_OF__ (fun () -> let fn = "examples/testout_letter1.txt" in write_letter fn; check_letter fn);
+  __LINE_OF__ (fun () -> let fn = "exercise09/examples/testout_letter1.txt" in write_letter fn; check_letter fn);
   (* tests for 9.3 - 6 *)
   __LINE_OF__ (fun () -> check_run_santas_factory ());
   (* tests for 9.3 - 7 *)
