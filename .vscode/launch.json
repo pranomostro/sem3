@@ -8,7 +8,7 @@
       "name": "OCaml Debug",
       "type": "ocaml-debugger",
       "request": "launch",
-      "cwd": "${workspaceFolder}",
+      "cwd": "${fileDirname}",
       "program": "ocamlbuild ${fileBasenameNoExtension}.d.byte && ./${fileBasenameNoExtension}.d.byte"
     }
   ]
