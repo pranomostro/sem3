@@ -6,28 +6,76 @@ type selection_alg = (string * int * int) list -> int -> string list
 
 exception Invalid_file_format of string
 
+let slurp fn=let file=open_in fn in
+	let rec read acc=try read ((input_line file)::acc)
+		with End_of_file -> let _=close_in file in acc
+	in
+	read []
+
 (* 9.3 - 1 *)
-let read_notes = todo
+
+let read_notes fn = let process x=match x with
+			| n::b::[] ->
+				if n="" then raise (Invalid_file_format fn) else
+				if b="nice" then (n, Nice) else
+				if b="naughty" then (n, Naughty) else
+				raise (Invalid_file_format fn)
+			| _ -> raise (Invalid_file_format fn)
+	in
+	slurp fn |>
+	List.map (String.split_on_char ':') |>
+	List.map process
 
 (* 9.3 - 2 *)
-let read_wishlist = todo
+let read_wishlist fn = let process x=match x with
+		| p::i::[] -> if p="" then raise (Invalid_file_format fn)
+			else let v=try int_of_string i with Failure _ -> raise (Invalid_file_format fn)
+			in (p, v)
+		| _ -> raise (Invalid_file_format fn)
+	in
+	slurp fn |>
+	List.map (String.split_on_char ':') |>
+	List.map process
 
 (* 9.3 - 3 *)
-let load_catalogue = todo
+let load_catalogue fn = read_wishlist fn
 
 (* 9.3 - 4 *)
-let write_list = todo
+let write_list fn sl = let file=open_out fn in
+	let rec dump sl=match sl with
+		| s::sr -> let _=output_string file (s^"\n") in dump sr
+		| [] -> close_out file
+	in
+	dump sl
 
 (* 9.3 - 5 *)
-let write_letter = todo
+let write_letter fn = let file=open_out fn in
+	let _=output_string file "Hello, dear naughty child. Yesterday, I watched a little sketch\nwhere a couple of people sit in a room in front of a whiteboard.\nOn the whiteboard one can see the word rapist, and some\nother word covered with paper above it. The person standing\nin front asks: 'What is worse than a rapist?', and then\nreveals the word 'child' above. The audience gasps, and\na man in the background audibly murmurs: 'A child'.\n" in
+	let _=close_out file in
+	()
 
 (* 9.3 - 6 *)
-let run_santas_factory = todo
+
+let toy_weight tn cat=match List.filter (fun x -> let (t, w)=x in t=tn) cat |>
+	List.map (fun x -> let (t, w)=x in w) with
+	| [] -> None
+	| w::ws -> Some w
+
+let add_weights wl cat = List.fold_left (fun acc x -> let (t, i)=x in match toy_weight t cat with
+	| Some w -> (t, i, w)::acc
+	| None -> acc) [] wl
+
+let run_santas_factory i a= let notes=read_notes "santas_notes.txt" in
+	let cat=load_catalogue "toys_catalogue.txt" in
+	let handle_child c=match c with
+		| (n, Naughty) -> write_letter (n^"_letter.txt")
+		| (n, Nice) -> let wl=read_wishlist (n^"_wishlist.txt") in
+			write_list (n^"_presents.txt") (a (add_weights wl cat) i)
+	in
+	List.map handle_child notes
 
 (* 9.3 - 7 *)
 let knapsack = todo
-
-
 
 (*****************************************************************************)
 (**************************** END OF HOMEWORK ********************************)
@@ -142,12 +190,4 @@ let () =
   in
   let passed = filter (fun x -> x) (map test tests) in
   printf "passed %d/%d tests\n" (length passed) (length tests)
-
-
-
-
-
-
-
-
 
