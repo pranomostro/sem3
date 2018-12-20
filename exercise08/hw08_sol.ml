@@ -85,7 +85,7 @@ let rec map f t =
 let find f t =
   let rec bfs queue =
     match queue with [] -> failwith "unreachable"
-    | q::qs -> let LNode (v, lf, rf) = q in if f v then q else bfs (List.rev (List.rev_append qs [lf (); rf ()]))
+    | q::qs -> let LNode (v, lf, rf) = q in if f v then q else bfs (List.rev (rf () :: lf () :: List.rev_append qs))
   in
   bfs [t]
 
