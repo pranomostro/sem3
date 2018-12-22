@@ -75,7 +75,12 @@ let run_santas_factory i a= let notes=read_notes "santas_notes.txt" in
 	List.map handle_child notes
 
 (* 9.3 - 7 *)
-let knapsack = todo
+
+let res ks pres w m = match pres with
+	| [] -> []
+	| p::ps -> ks ps w m
+
+let knapsack pres w=ks pres w (fun x y -> 0)
 
 (*****************************************************************************)
 (**************************** END OF HOMEWORK ********************************)
