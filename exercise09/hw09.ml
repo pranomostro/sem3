@@ -76,11 +76,13 @@ let run_santas_factory i a= let notes=read_notes "santas_notes.txt" in
 
 (* 9.3 - 7 *)
 
-let res ks pres w m = match pres with
-	| [] -> []
-	| p::ps -> ks ps w m
+let rec m p w s=match p with
+	| [] -> (0, s)
+	| (ni, vi, wi)::ps -> if wi>w then m ps w s else
+		let (fw, fp)=m ps w s and (aw, ap)=m ps (w-wi) (ni::s) in
+		if fw>(aw+vi) then (fw, fp) else (aw+vi, ap)
 
-let knapsack pres w=ks pres w (fun x y -> 0)
+let knapsack pres w=let (w, sp)=m pres w [] in sp
 
 (*****************************************************************************)
 (**************************** END OF HOMEWORK ********************************)
