@@ -15,6 +15,12 @@ int mem_init(unsigned int size, unsigned int blocksize, enum mem_algo strategy) 
     BLOCKSIZE = blocksize;
     STRATEGY = strategy;
     list = list_init();
+    struct memblock *elem;
+    elem->status = free_;
+    elem->size = size;
+    elem->in_use = 0;
+    elem->addr = malloc(sizeof(struct memblock));
+    list_insert(list, elem);
     mem_dump();
     return list;
 }
@@ -26,6 +32,9 @@ void *add_memblock(unsigned int size, struct list_elem *current) {
     remaining->status = free_;
     
     int blocks = size / BLOCKSIZE;
+    if (blocks == 0 && size % BLOCKSIZE > 0 || size > blocks * BLOCKSIZE) {
+        blocks += 1;
+    }
     elem->size = blocks * BLOCKSIZE;
     remaining->size = SIZE - elem->size;
     
@@ -48,6 +57,9 @@ void *mem_alloc (unsigned int size) {
         add_memblock(size, NULL);
     } else {
         int blocks = (size / BLOCKSIZE) * BLOCKSIZE;
+        if (blocks == 0 && size % BLOCKSIZE > 0) {
+            blocks = BLOCKSIZE;
+        }
         int worst_value = 0;
         struct list_elem *worst_elem = NULL;
         switch (STRATEGY)
@@ -95,6 +107,16 @@ void mem_free (void *addr) {
     if (elem != NULL) {
         elem->data->in_use = 0;
         elem->data->status = free_;
+        
+        // Proving if Memory can be merged (need some more work)
+        struct list_elem *first = list->first;
+        struct list_elem *second = NULL;
+        for( ; first != NULL; second = first, first = first->next) {
+            if (second != NULL && first->data->status == free_ && second->data->status == free_) {
+                first->data->size = first->data->size + second->data->size;
+                list_remove(list, second);
+            }
+        }
     }
     mem_dump();
 }
