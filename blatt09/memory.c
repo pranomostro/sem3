@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "memory.h"
 #include "list.h"
@@ -15,10 +16,10 @@ int mem_init(unsigned int size, unsigned int blocksize, enum mem_algo strategy) 
     STRATEGY = strategy;
     list = list_init();
     mem_dump();
-    // what to return?
+    return list;
 }
 
-void add_memblock(unsigned int size, struct list_elem *current) {
+void *add_memblock(unsigned int size, struct list_elem *current) {
     struct memblock *elem = malloc(sizeof(struct memblock));
     struct memblock *remaining = malloc(sizeof(struct memblock));
     elem->status = used;
@@ -31,10 +32,13 @@ void add_memblock(unsigned int size, struct list_elem *current) {
     elem->in_use = size;
     remaining->in_use = 0;
 
-    elem->addr = &elem;
-    remaining->addr = &remaining;
-    list_put(list, current, elem);
-    list_put(list, elem, remaining);
+    elem->addr = malloc(sizeof(struct memblock));
+    remaining->addr = malloc(sizeof(struct memblock));
+    list_remove(list, list->last);
+    list_append(list, elem);
+    list_append(list, remaining);
+    mem_dump();
+    return elem;
 }
 
 void *mem_alloc (unsigned int size) {
@@ -52,8 +56,7 @@ void *mem_alloc (unsigned int size) {
             case first:
                 for( ; temp != NULL; temp = temp->next) {
                     if (temp->data->status == free_ && temp->data->size >= blocks && temp->data->in_use <= blocks) {
-                        add_memblock(size, temp);
-                        break;
+                        return add_memblock(size, temp);
                     }
                 }
                 break;
@@ -68,6 +71,8 @@ void *mem_alloc (unsigned int size) {
                     worst_elem->data->status = used;
                     worst_elem->data->in_use = blocks;
                     worst_elem->data->size = blocks;
+                    mem_dump();
+                    return worst_elem;
                 }
                 break;
             default:
@@ -96,13 +101,13 @@ void mem_free (void *addr) {
 
 void print_elem(struct list_elem *elem) {
     if (elem->data->status == free_) {
-        printf("[%p %c %d/%d] ", &elem->data, 'F', elem->data->in_use, elem->data->size);
+        printf("[%p %c %d/%d] ", elem->data->addr, 'F', elem->data->in_use, elem->data->size);
     } else {
         printf("[%p %c %d/%d] ", &elem->data, 'P', elem->data->in_use, elem->data->size);
     }
-    
 }
 
 void mem_dump () {
     list_print(list, print_elem);
+    printf("\n");
 }

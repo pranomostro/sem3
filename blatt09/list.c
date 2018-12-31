@@ -111,7 +111,7 @@ void list_finit(list_t *list) {
 		list_remove(list, list->first);
 }
 
-void list_print(list_t *list, void (*print_elem) (struct memblock *)) {
+void list_print(list_t *list, void (*print_elem) (struct list_elem *)) {
 	int i;
 	struct list_elem *le;
 
