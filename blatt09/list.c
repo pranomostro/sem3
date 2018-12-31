@@ -28,23 +28,23 @@ list_t *list_init() {
 	return l;
 }
 
-struct list_elem *list_insert(list_t *list, char *data) {
+struct list_elem *list_insert(list_t *list, struct memblock *data) {
 	struct list_elem *le=malloc(sizeof(struct list_elem));
 
 	if(le==NULL)
 		return NULL;
 
-	le->data=data;
-	le->next=list->first;
-	list->first=le;
+	le->data = data;
+	le->next = list->first;
+	list->first = le;
 
 	if(list->last==NULL)
-		list->last=list->first;
+		list->last = list->first;
 
 	return le;
 }
 
-struct list_elem *list_append(list_t *list, char *data) {
+struct list_elem *list_append(list_t *list, struct memblock *data) {
 	struct list_elem *le=malloc(sizeof(struct list_elem));
 
 	if(le==NULL)
@@ -100,9 +100,8 @@ int list_remove(list_t *list, struct list_elem *elem) {
 
 struct list_elem *list_find(list_t *list, char *data, int (*cmp_elem) (const char *, const char *)) {
 	struct list_elem *le;
-
-	for(le=list->first; le!=NULL; le=le->next)
-		if(cmp_elem(le->data, data)==0)
+	for(le = list->first; le != NULL; le = le->next)
+		if(cmp_elem(le->data->addr, data) == 0)
 			return le;
 	return NULL;
 }
@@ -112,7 +111,7 @@ void list_finit(list_t *list) {
 		list_remove(list, list->first);
 }
 
-void list_print(list_t *list, void (*print_elem) (char *)) {
+void list_print(list_t *list, void (*print_elem) (struct memblock *)) {
 	int i;
 	struct list_elem *le;
 
@@ -121,6 +120,25 @@ void list_print(list_t *list, void (*print_elem) (char *)) {
 
 	for(i=1, le=list->first; le!=NULL; le=le->next, i++) {
 		printf("%d:", i);
-		print_elem(le->data);
+		print_elem(le);
 	}
+}
+
+struct list_elem *list_put(list_t *list, struct list_elem *current, struct memblock *data) {
+	struct list_elem *temp = list->first;
+	for( ; temp != NULL ; temp = temp->next) {
+		if (temp->data == current->data) {
+			if (temp->next != NULL) {
+				struct list_elem *next = temp->next;
+				struct list_elem *elem = malloc(sizeof(struct list_elem));
+				elem->data = data;
+				elem->next = next;
+				temp->next = elem;
+				return elem;
+			} else {
+				return list_append(list, data);
+			}
+		}
+	}
+	return NULL;
 }
