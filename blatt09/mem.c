@@ -71,7 +71,7 @@ main(int argc, char const *argv[])
                     perror("List_nth doesn't find the elem expected");
                     continue;
                 }
-                //printf("F: %d got %p\n", index, elem->data->addr);
+                printf("F: %d got %p\n", index, elem->data->addr);
                 mem_free(&elem);
                 break;
             case '?':
