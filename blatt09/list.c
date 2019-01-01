@@ -142,3 +142,12 @@ struct list_elem *list_put(list_t *list, struct list_elem *current, struct membl
 	}
 	return NULL;
 }
+
+struct list_elem *list_nth (list_t *list, unsigned int index) {
+	struct list_elem *elem = list->first;
+	int i = 0;
+	while(elem != NULL && i < index) {
+		elem = elem->next;
+	}
+	return elem;
+}
