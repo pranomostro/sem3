@@ -56,7 +56,7 @@ void *add_memblock(unsigned int size, struct list_elem *current) {
         remaining->size = remain;
         remaining->in_use = 0;
         remaining->status = free_;
-        remaining->addr = current->data->addr + current->data->size;    // Probably here is a mistake (I don't know yet)
+        remaining->addr = current->data->addr + current->data->size;
         list_put(list, current, remaining);
     }
     mem_dump();

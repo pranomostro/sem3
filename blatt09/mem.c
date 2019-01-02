@@ -6,6 +6,13 @@
 #include "list.h"
 #include "memory.h"
 
+enum status {
+    nothing,
+    block,
+    memory,
+    algo
+};
+
 
 main(int argc, char const *argv[])
 {
@@ -15,13 +22,12 @@ main(int argc, char const *argv[])
     }
 
     int c;
-    unsigned int memory_size = 0;
-    unsigned int blocksize = 0;
+    unsigned int memory_size = 1048576;
+    unsigned int blocksize = 4096;
     unsigned int index = 0;
     unsigned int size = 0;
     enum mem_algo strategy = none;
-    struct list_elem *elem = NULL;
-    int boolean = 0;
+    int init = 0;
     list_t *list = list_init();
 
     while ((c = getopt(argc, argv, "m:b:a:f:1w")) > -1) {
@@ -29,39 +35,25 @@ main(int argc, char const *argv[])
             case 'm':
                 memory_size = atoi(optarg);
                 //printf("M: %d\n", memory_size);
-                if (boolean == 1 && blocksize > 0 && strategy != none) {
-                    boolean = 0;
-                    mem_init(memory_size, blocksize, strategy);
-                }
                 break;
             case 'b':
                 blocksize = atoi(optarg);
                 //printf("B: %d\n", blocksize);
-                if (boolean == 1 && memory_size > 0 && strategy != none) {
-                    boolean = 0;
-                    mem_init(memory_size, blocksize, strategy);
-                }
                 break;
             case '1':
                 strategy = first;
                 //printf("1\n");
-                if (memory_size > 0 && blocksize > 0) {
-                    mem_init(memory_size, blocksize, strategy);
-                } else  {
-                    boolean = 1;
-                }
                 break;
             case 'w':
                 strategy = worst;
                 //printf("W\n");
-                if (memory_size > 0 && blocksize > 0) {
-                    mem_init(memory_size, blocksize, strategy);
-                } else  {
-                    boolean = 1;
-                }
                 break;
             case 'a':
                 size = atoi(optarg);
+                if (init == 0) {
+                    mem_init(memory_size, blocksize, strategy);
+                    init = 1;
+                }
                 //printf("A: %d\n", size);
                 mem_alloc(size);
                 break;
