@@ -20,6 +20,7 @@ main(int argc, char const *argv[])
     unsigned int index = 0;
     unsigned int size = 0;
     enum mem_algo strategy = none;
+    struct list_elem *elem = NULL;
     int boolean = 0;
     list_t *list = list_init();
 
@@ -62,17 +63,12 @@ main(int argc, char const *argv[])
             case 'a':
                 size = atoi(optarg);
                 //printf("A: %d\n", size);
-                list_append(list, mem_alloc(size));
+                mem_alloc(size);
                 break;
             case 'f':
                 index = atoi(optarg);
-                struct list_elem *elem = NULL;
-                if ((elem = list_nth(list, index)) == NULL) {
-                    perror("List_nth doesn't find the elem expected");
-                    continue;
-                }
-                printf("F: %d got %p\n", index, elem->data->addr);
-                mem_free(&elem);
+                //printf("F: %d\n", index);
+                mem_remove(index);
                 break;
             case '?':
                 if (optopt == 'm' || optopt == 'b' || optopt == 'a' || optopt == 'f') {

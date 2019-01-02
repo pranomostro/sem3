@@ -19,7 +19,7 @@ void *add_memblock_front(unsigned int size) {
     elem->addr = malloc(sizeof(struct memblock));
     list_insert(list, elem);
     mem_dump();
-    return elem;
+    return list;
 }
 
 int mem_init(unsigned int size, unsigned int blocksize, enum mem_algo strategy) {
@@ -51,12 +51,13 @@ void *add_memblock(unsigned int size, struct list_elem *current) {
     }
     int remain = current->data->size - used;
     current->data->size = used_size;
+    /* Add the remaining space into the list */
     if (used > 0) {
         struct memblock *remaining = malloc(sizeof(struct memblock));
         remaining->size = remain;
         remaining->in_use = 0;
         remaining->status = free_;
-        remaining->addr = current->data->addr + current->data->size;
+        remaining->addr = current->data->addr + current->data->size;    // Probably here is a mistake (I don't know yet)
         list_put(list, current, remaining);
     }
     mem_dump();
@@ -68,10 +69,10 @@ void *mem_alloc (unsigned int size) {
         return NULL;
     struct list_elem *temp = list->first;
     if (temp == NULL) {
-        add_memblock_front(size);
+        return add_memblock_front(size);
     } else {
         int blocks = (size / BLOCKSIZE) * BLOCKSIZE;
-        if (blocks == 0 && size % BLOCKSIZE > 0) {
+        if ((blocks == 0 && size % BLOCKSIZE > 0) || blocks < size) {
             blocks += BLOCKSIZE;
         }
         int worst_value = 0;
@@ -97,7 +98,7 @@ void *mem_alloc (unsigned int size) {
                     worst_elem->data->status = used;
                     worst_elem->data->in_use = blocks;
                     mem_dump();
-                    return worst_elem;
+                    return NULL;
                 }
                 break;
             default:
@@ -113,6 +114,16 @@ int cmp (const char *a, const char *b) {
         return 0;
     }
     return -1;
+}
+
+void mem_remove (unsigned int index) {
+    struct list_elem *elem = list_nth(list, index);
+    if (elem == NULL) {
+        printf("Debug: cannot find index %d\n", index);
+        mem_dump(); 
+        return;
+    }
+    mem_free(elem->data->addr);
 }
 
 void mem_free (void *addr) {
