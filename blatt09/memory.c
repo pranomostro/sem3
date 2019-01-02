@@ -38,7 +38,6 @@ void *add_memblock(unsigned int size, struct list_elem *current) {
     /* Setting the current element to used */
     current->data->status = used;
     current->data->in_use = size;
-    USED += size;
 
     /* If block is splitable, split block in elem and remaining */
     int used = (current->data->in_use / BLOCKSIZE) * BLOCKSIZE;
@@ -52,7 +51,7 @@ void *add_memblock(unsigned int size, struct list_elem *current) {
     int remain = current->data->size - used;
     current->data->size = used_size;
     /* Add the remaining space into the list */
-    if (used > 0) {
+    if (remain > 0) {
         struct memblock *remaining = malloc(sizeof(struct memblock));
         remaining->size = remain;
         remaining->in_use = 0;
@@ -75,7 +74,7 @@ void *mem_alloc (unsigned int size) {
         if ((blocks == 0 && size % BLOCKSIZE > 0) || blocks < size) {
             blocks += BLOCKSIZE;
         }
-        int worst_value = 0;
+        int blend = 0;
         struct list_elem *worst_elem = NULL;
         switch (STRATEGY)
         {
@@ -89,17 +88,12 @@ void *mem_alloc (unsigned int size) {
                 break;
             case worst:
                 for( ; temp != NULL; temp = temp->next) {
-                    if (temp->data->status == free_ && temp->data->size >= blocks && temp->data->size - temp->data->in_use > worst_value) {
-                        worst_value = temp->data->size - temp->data->in_use;
+                    if (temp->data->status == free_ && temp->data->size >= blocks && temp->data->size - size > blend) {
+                        blend = temp->data->size - size;
                         worst_elem = temp;
                     }
                 }
-                if (worst_elem != NULL) {
-                    worst_elem->data->status = used;
-                    worst_elem->data->in_use = blocks;
-                    mem_dump();
-                    return NULL;
-                }
+                return add_memblock(size, worst_elem);
                 break;
             default:
                 //Fehlerbehandlung
