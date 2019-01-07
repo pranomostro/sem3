@@ -6,7 +6,7 @@
     {
       "label": "ocaml",
       "type": "shell",
-      "command": "ocaml \"${file}\"",
+      "command": "cd ${fileDirname} && ocaml \"${file}\"",
       "group": {
         "kind": "build",
         "isDefault": true
