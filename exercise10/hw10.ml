@@ -1,4 +1,3 @@
-
 module type Ring = sig
   type t
   val zero : t
@@ -28,7 +27,59 @@ end
 (*****************************************************************************)
 (* Assignment 10.2 [20 Points] *)
 
-(* todo ... *)
+module IntRing=struct
+	type t=int
+	let zero=0
+	let one=1
+	let compare=compare
+	let to_string=string_of_int
+	let add=(+)
+	let mul=( * )
+end
+
+module FloatRing=struct
+	type t=float
+	let zero=0.0
+	let one=1.0
+	let compare=compare
+	let to_string=string_of_float
+	let add=(+.)
+	let mul=( *. )
+end
+
+module type FiniteRing=sig
+	include Ring
+	val elems : t list
+end
+
+module BoolRing=struct
+	type t=bool
+	let zero=false
+	let one=true
+	let compare=compare
+	let to_string=string_of_bool
+	let add=(||)
+	let mul=(&&)
+	let elems=[true;false]
+end
+
+module type SetRing=functor (X:FiniteRing) -> sig
+	include Ring
+end
+
+module SetRing : SetRing=functor (X:FiniteRing) -> struct
+	type t=X.t list
+	let zero=[]
+	let one=X.elems
+	let compare s1 s2=0
+	let to_string s=""
+	let add s1 s2=s1
+	let mul s1 s2=[]
+end
+
+let create n m=List.init n (fun _ -> List.init m (fun _ -> 0))
+let identity n=List.init n (fun p -> List.init n (fun r -> if p=r then 1 else 0))
+let from_rows l=l
 
 (*****************************************************************************)
 (**************************** END OF HOMEWORK ********************************)
@@ -53,7 +104,7 @@ let tests =
    * tests for 10.2 (IntRing) :
    * NOTE: Comment tests until you have completed your implementation of IntRing
    *)
-  (*
+
   let implementsRingSignature (module M : Ring) = true in
   [
   __LINE_OF__ (fun () -> implementsRingSignature (module IntRing));
@@ -61,13 +112,13 @@ let tests =
   __LINE_OF__ (fun () -> IntRing.add 10 IntRing.zero = 10);
   __LINE_OF__ (fun () -> IntRing.mul 10 IntRing.one = 10);
   __LINE_OF__ (fun () -> IntRing.to_string 10 = "10");
-  ] @ *)
+  ] @
 
   (******************************
    * tests for 10.2 (FloatRing) :
    * NOTE: Comment tests until you have completed your implementation of FloatRing
    *)
-  (*
+
   let implementsRingSignature (module M : Ring) = true in
   [
   __LINE_OF__ (fun () -> implementsRingSignature (module FloatRing));
@@ -75,13 +126,13 @@ let tests =
   __LINE_OF__ (fun () -> FloatRing.add 10.0 FloatRing.zero = 10.0);
   __LINE_OF__ (fun () -> FloatRing.mul 10.0 FloatRing.one = 10.0);
   __LINE_OF__ (fun () -> FloatRing.to_string 10.0 = "10.");
-  ] @ *)
+  ] @
 
   (*****************************
    * tests for 10.2 (BoolRing) :
    * NOTE: Comment tests until you have completed your implementation of BoolRing
    *)
-  (*
+
   let implementsFiniteRingSignature (module M : FiniteRing) = implementsRingSignature (module M) in
   [
   __LINE_OF__ (fun () -> implementsFiniteRingSignature (module BoolRing));
@@ -90,13 +141,12 @@ let tests =
   __LINE_OF__ (fun () -> BoolRing.mul true BoolRing.one = true && BoolRing.mul false BoolRing.one = false);
   __LINE_OF__ (fun () -> BoolRing.to_string true = "true");
   __LINE_OF__ (fun () -> BoolRing.elems |= [true;false]);
-  ] @ *)
+  ] @
 
   (****************************
    * tests for 10.2 (SetRing) :
    * NOTE: Comment tests until you have completed your implementation of SetRing
    *)
-  (*
   let module TestRing : FiniteRing with type t = char = struct
     let cfrom x = (int_of_char x) - (int_of_char 'a')
     let cto x = char_of_int (x mod 4 + int_of_char 'a')
@@ -121,7 +171,7 @@ let tests =
   __LINE_OF__ (fun () -> SR.mul ['a';'b'] ['c';'b'] |= ['b']);
   __LINE_OF__ (fun () -> SR.mul ['a';'b'] SR.one |= ['a';'b']);
   __LINE_OF__ (fun () -> check_string_representation (SR.to_string SR.one) ["'a'";"'b'";"'c'";"'d'"]);
-  ] @ *)
+  ] @
 
   (********************************
    * tests for 10.2 (DenseMatrix) :
