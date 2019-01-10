@@ -63,23 +63,65 @@ module BoolRing=struct
 	let elems=[true;false]
 end
 
-module type SetRing=functor (X:FiniteRing) -> sig
-	include Ring
-end
+let join l s=List.fold_right (fun x r -> if r="" then x else x^s^r) l ""
 
-module SetRing : SetRing=functor (X:FiniteRing) -> struct
+module SetRing (X:FiniteRing) : Ring with type t = X.t list=struct
 	type t=X.t list
 	let zero=[]
 	let one=X.elems
-	let compare s1 s2=0
-	let to_string s=""
-	let add s1 s2=s1
-	let mul s1 s2=[]
+	let compare s1 s2=let s1s=List.sort compare s1 and s2s=List.sort compare s2 in
+		let rec imp s1 s2=match s1, s2 with
+			| [], [] -> 0
+			| [], _ -> -1
+			| _, [] -> 1
+			| s1f::s1r, s2f::s2r -> if s1f<s2f then -1 else if s1f>s2f then 1 else imp s1r s2r
+		in
+		imp s1s s2s
+	let to_string s="{"^(join (List.map X.to_string s) ", ")^"}"
+	let add s1 s2=List.rev (List.fold_left (fun a x -> match a with
+		| [] -> x::a
+		| af::ar -> if af=x then a else x::a) [] (List.sort X.compare (s1 @ s2)))
+	let mul s1 s2=let cc=List.sort X.compare (s1 @ s2) in
+		let rec imp l=
+			match l with
+			| [] -> []
+			| [x] -> []
+			| [a;b] -> if a=b then [a] else []
+			| a::b::c::r -> if a=b && a<>c then a::(imp (c::r)) else imp (b::c::r)
+		in
+		imp cc
 end
 
-let create n m=List.init n (fun _ -> List.init m (fun _ -> 0))
-let identity n=List.init n (fun p -> List.init n (fun r -> if p=r then 1 else 0))
-let from_rows l=l
+module DenseMatrix (X:Ring) : Matrix with type elem=X.t and type t=X.t list list=struct
+	type t=X.t list list
+	type elem=X.t
+	let traverse f rn cn=
+		let rec rt f x y=if x=cn then [] else (f (x+1) (y+1))::(rt f (x+1) y)
+		in
+		let rec ct f y=if y=rn then [] else (rt f 0 y)::(ct f (y+1))
+		in
+		ct f 0
+	let create m n=traverse (fun x y -> X.zero) m n
+	let identity n=traverse (fun x y -> if x=y then X.one else X.zero) n n
+	let from_rows l=l
+	let rec get rn cn m=
+		let rec rt x y r=match m with
+			| [] -> raise (Failure "Out of bounds access")
+			| v::vr -> if x=cn then v else rt (x+1) y vr
+		in
+		let rec ct y m=match m with
+			| [] -> raise (Failure "Out of bounds access")
+			| r::rr -> if y=rn then rt 0 y r else ct (y+1) rr
+		in
+		ct 0 m
+	let rows m=List.length m
+	let cols m=if m=[] then 0 else let c::cr=m in List.length c
+	let set rn cn v m=traverse (fun x y -> if x=cn && y=rn then v else get y x m) (rows m) (cols m)
+	let transpose m=m
+	let add m1 m2=m1
+	let mul m1 m2=m1
+	let to_string m=""
+end
 
 (*****************************************************************************)
 (**************************** END OF HOMEWORK ********************************)
@@ -178,7 +220,6 @@ let tests =
    * NOTE: Comment tests until you have completed your implementation of DenseMatrix
    * NOTE: from_rows and get have to be correct in order for these tests to work correctly!
    *)
-  (*
   let module DM = DenseMatrix (IntRing) in
   let dm0 = DM.from_rows [[4;-2;1];[0;3;-1]] in
   let dm1 = DM.from_rows [[1;2];[-3;4];[3;-1]] in
@@ -193,7 +234,7 @@ let tests =
     __LINE_OF__ (fun () -> check_dense (DM.add dm0 dm0) [[8;-4;2];[0;6;-2]]);
     __LINE_OF__ (fun () -> check_dense (DM.mul dm0 dm1) [[13;-1];[-12;13]]);
     __LINE_OF__ (fun () -> (DM.to_string dm0) = "4 -2 1\n0 3 -1");
-  ] @ *)
+  ] @
 
   (*********************************
    * tests for 10.2 (SparseMatrix) :
