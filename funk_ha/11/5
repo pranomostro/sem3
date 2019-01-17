@@ -1,0 +1,44 @@
+\documentclass{article}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\begin{document}
+
+\section*{11.5}
+
+\subsection*{1.}
+
+$$ \pi_{fold\_left}:=GD\frac
+	{
+		\hbox{fold\_left}=\hbox{fun f a l match l with [] a | x::xs fold\_left f (f a x) xs, }
+		\hbox{fun f a l match l with [] a | x::xs fold\_left f (f a x) xs}
+			\Rightarrow
+		\hbox{fun f a l match l with [] a | x::xs fold\_left f (f a x) xs}
+	}
+	{
+		\hbox{fold\_left} \Rightarrow \hbox{fun f a l match l with [] a | x::xs fold\_left f (f a x) xs}
+	}
+$$
+
+$$ \pi_{mul}:=GD\frac
+	{
+		hbox{mul}=\hbox{fun a b a*b, }
+		\hbox{fun a b a*b} \Rightarrow \hbox{fun a b a*b}
+	}
+	{
+		\hbox{mul} \Rightarrow \hbox {fun a b a*b}
+	}
+
+$$ APP \frac
+	{
+		\pi_{fold\_left}\hbox{, }
+		\hbox{mul} \Rightarrow \hbox{?, }
+		\hbox{3} \Rightarrow \hbox{?, }
+		\hbox{[10]} \Rightarrow \hbox{?}
+	}
+	{
+		\hbox{fold\_left mul 3 [10]} \Rightarrow 30
+} $$
+
+\end{document}

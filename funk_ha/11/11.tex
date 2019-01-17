@@ -1,0 +1,59 @@
+\documentclass{article}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\begin{document}
+
+\section*{11.5}
+
+\subsection*{1.}
+
+$$ \pi_{10}:=LI\frac
+	{
+		\hbox{10} \Rightarrow \hbox{10, } \hbox{[]} \Rightarrow \hbox{[]}
+	}
+	{\hbox{[10]} \Rightarrow\hbox{10::[]}}
+$$
+
+$$ \pi_{mul}:=GD\frac
+	{
+		\hbox{mul}=\hbox{fun a b a*b, }
+		\hbox{fun a b a*b} \Rightarrow \hbox{fun a b a*b}
+	}
+	{
+		\hbox{mul} \Rightarrow \hbox {fun a b a*b}
+	}
+$$
+
+$$ \pi_{fold\_left}:=GD\frac
+	{
+		\hbox{fold\_left}=\hbox{fun f a l match l with [] a | x::xs fold\_left f (f a x) xs, }
+		\hbox{fun f a l match l with [] a | x::xs fold\_left f (f a x) xs}
+			\Rightarrow
+		\hbox{fun f a l match l with [] a | x::xs fold\_left f (f a x) xs}
+	}
+	{
+		\hbox{fold\_left} \Rightarrow \hbox{fun f a l match l with [] a | x::xs fold\_left f (f a x) xs}
+	}
+$$
+
+$$ APP \frac
+	{
+		\pi_{fold\_left}\hbox{, }
+		\pi_{mul}\hbox{, }
+		\hbox{3} \Rightarrow \hbox{3, }
+		\pi_{10}\hbox{, }
+		MAT
+		\frac
+		{
+			\pi_{10} \equiv 10::[] \hbox{, } \hbox{fold\_left mul (mul 3 10) [] \Rightarrow 30
+		}
+		{\hbox{match [10] with [] [] | x::xs fold\_left mul (mul 3 x) xs} \Rightarrow 30}
+	}
+	{
+		\hbox{fold\_left mul 3 [10]} \Rightarrow 30
+	}
+$$
+
+\end{document}

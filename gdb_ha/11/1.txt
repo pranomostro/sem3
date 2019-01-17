@@ -1,0 +1,13 @@
+1.
+SQL: select distinct a.PersNr, a.Name
+
+from Assistenten a, Studenten s, pruefen p
+where s.MatrNr=p.MatrNr
+and a.Boss=p.PersNr
+and s.Name='Jonas'
+
+⋈
+π(a.PersNr, a.Name)(σ(s.MatrNr=p.MatrNr, a.Boss=p.PersNr, s.Name='Jonas')(pruefen p×(Assistenten a×Studenten s)))
+π(a.PersNr, a.Name)(σ(s.MatrNr=p.MatrNr)(σ(a.Boss=p.PersNr)(σ(s.Name='Jonas')(pruefen p×(Assistenten a×Studenten s)))))
+π(a.PersNr, a.Name)(σ(s.MatrNr=p.MatrNr)(σ(a.Boss=p.PersNr)(pruefen p×(Assistenten a×(σ(Name='Jonas')(Studenten))))))
+π(a.PersNr, a.Name)(pruefen p()⋈ (s.MatrNr=p.MatrNr)((Assistenten a)⋈ ()))
