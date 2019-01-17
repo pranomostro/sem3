@@ -104,19 +104,10 @@ module DenseMatrix (X:Ring) : Matrix with type elem=X.t and type t=X.t list list
 	let create m n=traverse (fun x y -> X.zero) m n
 	let identity n=traverse (fun x y -> if x=y then X.one else X.zero) n n
 	let from_rows l=l
-	let rec get rn cn m=
-		let rec rt x y r=match m with
-			| [] -> raise (Failure "Out of bounds access")
-			| v::vr -> if x=cn then v else rt (x+1) y vr
-		in
-		let rec ct y m=match m with
-			| [] -> raise (Failure "Out of bounds access")
-			| r::rr -> if y=rn then rt 0 y r else ct (y+1) rr
-		in
-		ct 0 m
+	let get rn cn m=List.nth (List.nth m rn) cn
 	let rows m=List.length m
 	let cols m=if m=[] then 0 else let c::cr=m in List.length c
-	let set rn cn v m=traverse (fun x y -> if x=cn && y=rn then v else get y x m) (rows m) (cols m)
+	let set rn cn v m=traverse (fun x y -> if x=cn && y=rn then v else get y x m) ((rows m)-1) ((cols m)-1)
 	let transpose m=m
 	let add m1 m2=m1
 	let mul m1 m2=m1
