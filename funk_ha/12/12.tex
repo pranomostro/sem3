@@ -47,11 +47,7 @@ m+nlen n x::xs
 (match)=m+n+nlen n xs
 (arith)=n+m+nlen n xs
 (ia)=n+fold_left (+) m (map (fun _ -> n) xs)
-(arith)=(+) n (fold_left (+) m (map (fun _ -> n) xs))
-(fold_left)=(+) n (match (map (fun _ -> n) xs) with [] -> m
-	| h::t -> fold_left (+) ((+) m h) t)
-...
-=fold_left (+) ((+) m n) (map (fun _ -> n) xs)
+(zusatzbeweis)=fold_left (+) ((+) m n) (map (fun _ -> n) xs)
 (map)=match n::(map (fun _ -> n) xs) with [] -> m
 	| h::t fold_left (+) ((+) m h) t
 (fold_left)=fold_left (+) m ((fun _ -> n) x :: map (fun _ -> n) xs)
@@ -60,11 +56,48 @@ m+nlen n x::xs
 (map)=fold_left (+) m (map fun _ -> n) x::xs)
 \end{lstlisting}
 
-\subsection*{TODO}
+\subsection*{Zusatzbeweis}
 
 \begin{lstlisting}
-n+fold_left (+) m (map (fun _ -> n) xs)=
-fold_left (+) (m+n) (map (fun _ -> n) xs)
+z.Z:
+
+n+fold_left (+) m l=fold_left (+) (m+n) l
+\end{lstlisting}
+
+\subsubsection*{IB}
+
+\begin{lstlisting}
+z.Z: n+fold_left (+) m []=fold_left (+) (m+n) []
+
+n+fold_left (+) m []
+(fold_left)=n+match [] with [] -> m
+	| h::t fold_left (+) ((+) m h) t
+(match)=n+m
+(match)=match [] with [] -> n+m
+	| h::t fold_left (+) ((+) m h) t
+(fold_left)=fold_left (+) (n+m) []
+\end{lstlisting}
+
+\subsubsection*{IA}
+
+\begin{lstlisting}
+n+fold_left (+) m xs=fold_left (+) (m+n) xs
+\end{lstlisting}
+
+\subsubsection*{IS}
+
+\begin{lstlisting}
+z.Z: n+fold_left (+) m x::xs=fold_left (+) (m+n) x::xs
+
+n+fold_left (+) m x::xs
+(fold_left)=n+match x::xs with [] -> m
+	| h::t -> fold_left (+) ((+) m x) xs
+(match)=n+fold_left (+) (m+x) xs
+(subst)=n+fold_left (+) (m+(fun _ -> n) x) xs
+(fun)=n+fold_left (+) (m+n) xs
+(match)=match ((fun _ -> n) x{::xs with [] -> m+n
+	| h::t -> fold_left (+) ((fun _ -> n) x+(m+n)) xs
+(fold_left)=fold_left (+) (m+n) x::xs
 \end{lstlisting}
 
 \section*{12.5}
@@ -81,37 +114,40 @@ fl (+) 0 (rev_map (fun x -> 2*x) [] [])
 =match [] with [] -> 0
 =0
 =match [] with [] -> 0
-	| x::xs (fun x a -> a+2*x) x (fr (fun x a -> a+2*x) xs 0)
+	| x::xs -> (fun x a -> a+2*x) x (fr (fun x a -> a+2*x) xs 0)
 =fr (fun x a -> a+2*x) [] 0
 \end{lstlisting}
 
 \subsection*{IA}
 
 \begin{lstlisting}
-fl (+) 0 (rev_map (fun x -> x*2) xs []) = fr (fun x a -> a+2*x) xs 0
+fl (+) m (rev_map (fun x -> x*2) t l) = fr (fun x a -> a+2*x) t m
 \end{lstlisting}
 
 \subsection*{IS}
 
 \begin{lstlisting}
-z.Z: fl (+) 0 (rev_map (fun x -> x*2) h::t []) = fr (fun x a -> a+2*x) h::t 0
+z.Z: fl (+) m (rev_map (fun x -> x*2) h::t l) = fr (fun x a -> a+2*x) h::t m
 
-fl (+) 0 (rev_map (fun x -> x*2) h::t [])
+fl (+) m (rev_map (fun x -> x*2) h::t l)
 =match
-	(rev_map (fun x -> x*2) h::t [])
-	with [] -> 0 | x::xs -> fl (fun x -> x*2) ((fun x -> x*2) 0 x) xs
+	(rev_map (fun x -> x*2) h::t l)
+	with [] -> m | x::xs -> fl (fun x -> x*2) ((fun x -> x*2) m x) xs
 =match
 	(match h::t with [] -> []
-		| x::xs -> rev_map (fun x -> x*2) xs ((fun x -> x*2) x::[]))
-	with [] -> 0 | x::xs -> fl (fun x -> x*2) ((fun x -> x*2) 0 x) xs
+		| x::xs -> rev_map (fun x -> x*2) xs ((fun x -> x*2) x::l))
+	with [] -> m | x::xs -> fl (fun x -> x*2) ((fun x -> x*2) m x) xs
 =match
-	(rev_map (fun x -> x*2) t ((fun x -> x*2) h::[]))
-	with [] -> 0 | x::xs -> fl (fun x -> x*2) ((fun x -> x*2) 0 x) xs
+	(rev_map (fun x -> x*2) t ((fun x -> x*2) h::l))
+	with [] -> m | x::xs -> fl (fun x -> x*2) ((fun x -> x*2) m x) xs
 =match
-	(rev_map (fun x -> x*2) t (2*h::[])
-	with [] -> 0 | x::xs -> fl (fun x -> x*2) ((fun x -> x*2) 0 x) xs
+	(rev_map (fun x -> x*2) t (2*h::l)
+	with [] -> m | x::xs -> fl (fun x -> x*2) ((fun x -> x*2) m x) xs
 ...
-=fr (fun x a -> a+2*x) h::t 0
+=(fun x a -> a+2*x) h (fr (fun x a -> a+2*x) t m)
+(match)=match match h::t with [] -> m
+	| x::xs -> (fun x a -> a+2*x) x (fr (fun x a -> a+2*x) xs m)
+(fr)=fr (fun x a -> a+2*x) h::t m
 \end{lstlisting}
 
 \section*{12.6}
@@ -151,12 +187,8 @@ z.Z: fl (+) m (to_list Node(v,t1,t2))=tf add3 m Node(v,t1,t2)
 fl (+) m (to_list Node(v,t1,t2))
 (to_list)=fl (+) m (match (Node(v,t1,t2) with Empty -> []
 	| Node (x,l,r) -> app (to_list l) (x::to_list r)
-(app)=fl (+) m (match t with Empty -> [] 
-	| Node (x,l,r) ->
-
-=(fl (+) m (to_list t1)+v+(match (to_list t2) with [] -> m
-	| x::xs -> fl x::
-
+(match)=fl (+) m (app (to_list t1) (v::to_list t2))
+TODO
 =fl (+) m (to_list t1)+v+fl (+) m (to_list t2)
 (ia)=(tf add3 m t1)+v+(tf add3 m t2)
 (add3)=add3 (tf add3 m t1) v (tf add3 m t2)
@@ -168,7 +200,38 @@ fl (+) m (to_list Node(v,t1,t2))
 \subsection*{TODO}
 
 \begin{lstlisting}
-n+fl (+) m l=fl (+) (m+n) l
+fl (+) m (app (to_list t1) (v::to_list t2i))=
+fl (+) m (to_list t1)+v+fl (+) m (to_list t2)
+\end{lstlisting}
+
+\subsection*{ATTEMPT}
+
+\begin{lstlisting}
+(app)=fl (+) m (match (to_list t1) with [] -> (v::to_list t2)
+	| x::xs -> x::app xs (v::to_list t2))
+(to_list)=fl (+) m (match (match t1 with Empty -> []
+	| Node (x,l,r) -> app (to_list l) (x::to_list r))
+	with [] -> (v::to_list t2)
+	| x::xs -> x::app xs (v::to_list t2))
+
+Fallunterscheidung
+t1=Empty:
+
+(match)=fl (+) m (match [] with [] -> (v::to_list t2)
+	| x::xs -> x::app xs (v::to_list t2)
+(match)=fl (+) m (v::to_list t2)
+(match)=(match (match Empty with Empty -> []
+	| Node(x,l,r) -> app (to_list l) (x::to_list r))
+	with [] -> m
+	| x::xs -> fl (+) ((+) m x) xs)
+	+fl (+) m (v::to_list t2)
+(match)=fold_left (+) m (to_list t1)+fl (+) m (v::to_list t2)
+
+t1=Node(vt,lt,rt):
+TODO
+
+=(fl (+) m (to_list t1)+v+(match (to_list t2) with [] -> m
+	| x::xs -> fl x::
 \end{lstlisting}
 
 \end{document}
