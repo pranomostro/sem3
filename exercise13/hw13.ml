@@ -40,10 +40,14 @@ open Thread
 open Event
 
 (* 13.4 *)
-let par_unary f a = failwith "TODO"
 
-let par_binary f a b = failwith "TODO"
+let par_unary f a=List.map (fun x -> (x, new_channel())) a
+	|> List.map (fun x -> let (v,ch)=x in ((create (fun x -> (sync (send ch (f x)))) v),ch))
+	|> List.map (fun x -> let (id,ch)=x in sync (receive ch))
 
+let par_binary f a b = List.init (List.length a) (fun n -> ((List.nth a n), (List.nth b n), new_channel()))
+	|> List.map (fun x -> let (va,vb,ch)=x in ((create (fun x -> (sync (send ch (f va vb)))) vb),ch))
+	|> List.map (fun x -> let (id, ch)=x in sync (receive ch))
 
 (* 13.5 *)
 exception OutOfBounds
