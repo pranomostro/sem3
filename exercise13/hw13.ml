@@ -50,29 +50,37 @@ let par_binary f a b = List.init (List.length a) (fun n -> ((List.nth a n), (Lis
 	|> List.map (fun x -> let (id, ch)=x in sync (receive ch))
 
 (* 13.5 *)
+
 exception OutOfBounds
 
-module Array = struct
-  type 'a t = unit (* todo *)
+type 'a req=Get of 'a channel * int | Set of int * 'a | Resize of int * 'a | Size of int channel | Exit
+type 'a array='a req channel
 
-  let make s v = failwith "TODO"
-
-  let size a = failwith "TODO"
-
-  let set i v a = failwith "TODO"
-
-  let get i a = failwith "TODO"
-
-  let resize s v a = failwith "TODO"
-
-  let destroy a = failwith "TODO"
-
+module Array=struct
+	let size ch=let reply=new_channel() in sync (send ch (Size reply)); sync (receive reply)
+	let destroy ch=sync (send ch Exit)
+	let set i v ch=if i>=(size ch) then raise OutOfBounds else sync (send ch (Set (i,v)))
+	let get i ch=if i>=(size ch) then raise OutOfBounds else let reply=new_channel() in
+		sync (send ch (Get (reply,i))); sync (receive reply)
+	let resize i v ch=sync (send ch (Resize (i,v)))
+	let make s v=let arr=new_channel() in
+		let rec serve l=
+			match sync(receive arr) with
+			| Get (ch, i) -> sync (send ch (List.nth l i)); serve l
+			| Set (i, v) -> serve (List.init (List.length l) (fun n -> if n=i then v else List.nth l n))
+			| Resize (i, v) -> serve (List.init i (fun n -> if n>=(List.length l) then v else List.nth l n))
+			| Size ch -> sync (send ch (List.length l)); serve l
+			| Exit -> exit
+		in
+			create serve (List.init s (fun _ -> v));
+			arr
 end
-
 
 (* 13.6 *)
 exception InvalidOperation
 
+type 'a docreq=Addacc of string * string | Pub of String * string * string | View of string * string * int | Addviewer of string * string * int
+type 'a docserver='a docreq channel
 
 let document_server () = failwith "TODO"
 
