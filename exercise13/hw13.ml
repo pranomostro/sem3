@@ -79,21 +79,20 @@ end
 (* 13.6 *)
 exception InvalidOperation
 
-type 'a docreq=Addacc of string * string | Pub of String * string * string | View of string * string * int | Addviewer of string * string * int
+type 'a docreq=Addacc of string * string | Pub of string * string * string * int channel | View of string * string * int * string channel | Addviewer of string * string * int * string | Chgowner of string * string * int * string
 type 'a docserver='a docreq channel
 
-let document_server () = failwith "TODO"
+let document_server ()=let server=new_channel() in
+		let rec serve t=serve t
+	in
+		create serve [];
+		server
 
-let publish u p doc s = failwith "TODO"
-
-let change_owner u p id owner s = failwith "TODO"
-
-let view u p id s = failwith "TODO"
-
-let add_account u p s = failwith "TODO"
-
-let add_viewer u p id viewer s = failwith "TODO"
-
+let publish u p doc s=let re=new_channel() in sync (send s (Pub (u,p,doc,re))); sync (receive re)
+let change_owner u p id owner s=sync (send s (Chgowner (u,p,id,owner)));s
+let view u p id s=let re=new_channel() in sync (send s (View (u,p,id,re))); sync (receive re)
+let add_account u p s=sync (send s (Addacc (u,p)));s
+let add_viewer u p id viewer s=sync (send s (Addviewer (u,p,id,viewer)))
 
 (*****************************************************************************)
 (**************************** END OF HOMEWORK ********************************)
