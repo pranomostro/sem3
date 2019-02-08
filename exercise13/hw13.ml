@@ -82,27 +82,41 @@ exception InvalidOperation
 type 'a docreq=Addacc of string * string | Pub of string * string * string * int channel | View of string * string * int * string channel | Addviewer of string * string * int * string | Chgowner of string * string * int * string
 type 'a docserver='a docreq channel
 
-(* usr: (name,pwd); views: (id,name); owns: (id,name); docs: (id, text))*)
+(* usr: (name,pwd); views: (id,name); owns: (id,name); docs: (id, text)) *)
 
 let document_server ()=let server=new_channel() in
-		let rec serve usrs views owns docs dnum=
+		let rec serve usrs views owns docs id=
+			let key_exists k t=(List.map (fun x -> let (v,_)=x in v) t
+				|> List.filter (fun a -> a=k))<>[]
+			in
 			let correct_pwd usr pwd=
 				List.assoc usr usrs=pwd
+(*
+			and
+			in_viewers id usr=match List.assoc_opt id views with
+				| Some l -> (match List.find_opt l usr with
+					| Some v -> true
+					| None -> false)
+				| None -> false
+*)
 			in
 			match sync (receive server) with
 			| Addacc (usr,pwd) ->
-				if (List.map (fun x -> let (u,p)=x in u) usrs
-					|> List.filter (fun a -> a=usr))=[]
-				then raise InvalidOperation else
-				serve ((usr,pwd)::usrs) views owns docs dnum
+				if key_exists usr usrs then raise InvalidOperation else
+				serve ((usr,pwd)::usrs) views owns docs id
 			| Pub (usr,pwd,doc,ch) ->
 				if correct_pwd usr pwd then
-					(sync (send ch (dnum+1));
-					serve usrs views ((id,usr)::owns) docs (dnum+1))
+					(sync (send ch id);
+					serve usrs ((id,[usr])::views) ((id,usr)::owns) ((id,doc)::docs) (id+1))
 				else raise InvalidOperation
-			| View (usr,pwd,id,ch) -> serve usrs views owns docs dnum
-			| Addviewer (usr,pwd,id,viewer) -> serve usrs views owns docs dnum
-			| Chgowner (usr,pwd,id,nown) -> serve usrs views owns docs dnum
+			| View (usr,pwd,id,ch) ->
+(*
+				if in_viewers id usr then serve usrs views owns docs id
+				else raise InvalidOperation
+*)
+				serve usrs views owns docs id
+			| Addviewer (usr,pwd,id,viewer) -> serve usrs views owns docs id
+			| Chgowner (usr,pwd,id,nown) -> serve usrs views owns docs id
 	in
 		let runserv=serve [] [] [] [] 0
 	in
