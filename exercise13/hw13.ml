@@ -82,10 +82,31 @@ exception InvalidOperation
 type 'a docreq=Addacc of string * string | Pub of string * string * string * int channel | View of string * string * int * string channel | Addviewer of string * string * int * string | Chgowner of string * string * int * string
 type 'a docserver='a docreq channel
 
+(* usr: (name,pwd); views: (id,name); owns: (id,name); docs: (id, text))*)
+
 let document_server ()=let server=new_channel() in
-		let rec serve t=serve t
+		let rec serve usrs views owns docs dnum=
+			let correct_pwd usr pwd=
+				List.assoc usr usrs=pwd
+			in
+			match sync (receive server) with
+			| Addacc (usr,pwd) ->
+				if (List.map (fun x -> let (u,p)=x in u) usrs
+					|> List.filter (fun a -> a=usr))=[]
+				then raise InvalidOperation else
+				serve ((usr,pwd)::usrs) views owns docs dnum
+			| Pub (usr,pwd,doc,ch) ->
+				if correct_pwd usr pwd then
+					(sync (send ch (dnum+1));
+					serve usrs views ((id,usr)::owns) docs (dnum+1))
+				else raise InvalidOperation
+			| View (usr,pwd,id,ch) -> serve usrs views owns docs dnum
+			| Addviewer (usr,pwd,id,viewer) -> serve usrs views owns docs dnum
+			| Chgowner (usr,pwd,id,nown) -> serve usrs views owns docs dnum
 	in
-		create serve [];
+		let runserv=serve [] [] [] [] 0
+	in
+		create runserv ();
 		server
 
 let publish u p doc s=let re=new_channel() in sync (send s (Pub (u,p,doc,re))); sync (receive re)
