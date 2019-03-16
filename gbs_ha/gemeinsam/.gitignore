@@ -1,0 +1,9 @@
+*
+!*_test
+!*.*
+!Makefile
+!makefile
+!*/
+*.tar
+*.tgz
+*.pdf
