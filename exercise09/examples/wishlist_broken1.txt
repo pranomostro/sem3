@@ -1,3 +1,0 @@
-horse:3
-ocaml book
-time machine:12

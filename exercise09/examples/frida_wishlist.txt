@@ -1,3 +1,0 @@
-ocaml book:10
-horse:3
-colorful pencils:12

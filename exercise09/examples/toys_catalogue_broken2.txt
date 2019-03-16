@@ -1,3 +1,0 @@
-horse:10
-unicorn:sand toys
-soccer shoes:3
