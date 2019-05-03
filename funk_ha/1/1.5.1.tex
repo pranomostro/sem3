@@ -21,7 +21,7 @@ is not the case when x=-1.
 Therefore, no such A can exist.
 
 \iffalse
-x<0Λy=2↦x<-2Λy>0
+x<0∧y=2↦x<-2∧y>0
 
 x<0↦x<-2
 y=2↦y>0
@@ -31,17 +31,17 @@ b:=y=2
 c:=x<-2
 d:=y>0
 
-((aΛb)↦A)Λ(A↦(cΛd))Λ(c↦a)Λ(b↦d)
+((a∧b)↦A)∧(A↦(c∧d))∧(c↦a)∧(b↦d)
 
 c↦a (eigener Beweis?)
 b↦d (eigener Beweis?)
 
-(aΛb)↦(cΛd)
-~a∨~b∨(cΛd)
-~a∨((~b∨c)Λ(~b∨d))
-(~a∨~b∨c)Λ(~a∨~b∨d)
+(a∧b)↦(c∧d)
+~a∨~b∨(c∧d)
+~a∨((~b∨c)∧(~b∨d))
+(~a∨~b∨c)∧(~a∨~b∨d)
 
-(~a∨~b∨c)Λ(~a∨~b∨d)Λ(~b∨d)
+(~a∨~b∨c)∧(~a∨~b∨d)∧(~b∨d)
 
 In Klauselform:
 {{~a,~b,c},{~a,~b,d},{~b,d},{~c,a}}

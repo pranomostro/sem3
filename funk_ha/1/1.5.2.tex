@@ -20,17 +20,17 @@ x>2↦x>5
 
 und das ist nicht korrekt für x=3.
 
-(x>2↦A)Λ(A↦BΛx>2)Λ(B↦x>5)
+(x>2↦A)∧(A↦B∧x>2)∧(B↦x>5)
 
 C==x>2
 D==x>5
 
 D↦C
 
-(C↦A)Λ(A↦BΛC)Λ(B↦D)Λ(D↦C)Λ~(C↦D)
+(C↦A)∧(A↦B∧C)∧(B↦D)∧(D↦C)∧~(C↦D)
 
-(~C∨A)Λ(~A∨(BΛC))Λ(~B∨D)Λ(~D∨C)Λ(~D∨C)Λ~(~C∨D)
-(~C∨A)Λ(~A∨B)Λ(~A∨C)Λ(~B∨D)Λ(~D∨C)Λ(~D∨C)ΛCΛ(~D)
+(~C∨A)∧(~A∨(B∧C))∧(~B∨D)∧(~D∨C)∧(~D∨C)∧~(~C∨D)
+(~C∨A)∧(~A∨B)∧(~A∨C)∧(~B∨D)∧(~D∨C)∧(~D∨C)∧C∧(~D)
 
 {{~C,A},{~A,B},{~A,C},{~B,D},{~D,C},{C},{~D}}
 OLR auf C:
